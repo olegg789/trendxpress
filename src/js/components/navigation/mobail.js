@@ -5,7 +5,11 @@ import {
 	Tabbar,
 	TabbarItem
 } from '@vkontakte/vkui';
-import { Icon28HomeOutline, Icon28Profile } from '@vkontakte/icons';
+import {
+	Icon28MarketOutline,
+	Icon28ShoppingCartOutline,
+	Icon28StorefrontOutline
+} from '@vkontakte/icons';
 
 function MobailNavigation({ router }) {
 
@@ -23,15 +27,22 @@ function MobailNavigation({ router }) {
 	      <TabbarItem
 	        selected={router.activeView === 'home'}
 	        onClick={() => openView('home')}
-	        text='Главная'
-	      ><Icon28HomeOutline/></TabbarItem>
+	        text='Товары'
+	      ><Icon28StorefrontOutline/></TabbarItem>
 
 	      <TabbarItem
-	        data-id='profile'
-	        selected={router.activeView === 'profile'}
-					onClick={() => openView('profile')}
-	        text='Профиль'
-	      ><Icon28Profile/></TabbarItem>
+	        data-id='cart'
+	        selected={router.activeView === 'cart'}
+			onClick={() => openView('cart')}
+	        text='Корзина'
+	      ><Icon28ShoppingCartOutline/></TabbarItem>
+
+			<TabbarItem
+				data-id='orders'
+				selected={router.activeView === 'orders'}
+				onClick={() => openView('orders')}
+				text='Заказы'
+			><Icon28MarketOutline/></TabbarItem>
 	    </Tabbar>
 	)
 }

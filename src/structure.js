@@ -9,19 +9,30 @@ const structure = [
 			},
 
 			{
-				id: "placeholder",
+				id: "infoProduct",
 				hash: '/placeholder'
 			}
 		]
 	},
 
 	{
-		id: "profile",
+		id: "cart",
 		hash: "profile",
 		panels: [
 			{
 				id: "base",
 				hash: '/base'
+			}
+		]
+	},
+
+	{
+		id: "orders",
+		hash: "orders",
+		panels: [
+			{
+				id: 'base',
+				hash: '/'
 			}
 		]
 	}

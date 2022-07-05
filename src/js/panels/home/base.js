@@ -1,134 +1,69 @@
-import React, { useState } from 'react';
-import { withRouter } from '@reyzitwo/react-router-vkminiapps';
-
+import React from "react";
+import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
-    Div,  
-    Alert, 
-    Group, 
-    Button, 
+    Avatar, Card, CardGrid,
+    Div, Footer, FormItem, FormLayoutGroup,
+    Group, Headline, HorizontalCell,
     PanelHeader,
-    ScreenSpinner,
-    Snackbar,
-    Avatar
-} from '@vkontakte/vkui'
-import { Icon16Done } from '@vkontakte/icons'
-import img from '../../../svg/chel.svg'
+    PanelHeaderButton,
+    SimpleCell
+} from "@vkontakte/vkui";
+import {Icon28UserStarBadgeOutline} from "@vkontakte/icons";
+import {useDispatch, useSelector} from "react-redux";
+import {set} from "../../reducers/mainReducer";
 
-function HomePanelBase({ router }) {
-    const [showImg, setShowImg] = useState(false)
-    const [snackbar, setSnackbar] = useState(null)
+function Market({router, products, declOfNum}) {
+    const storage = useSelector((state) => state.main)
+    const dispatch = useDispatch()
 
-    function openAlert() {
-        router.toPopout(
-            <Alert
-                actions={[{
-                    title: 'Нет',
-                    autoclose: true,
-                    mode: 'cancel',
-                }, {
-                    title: 'Да',
-                    autoclose: true,
-                    mode: 'destructive',
-                    action: () => setShowImg(true)
-                }]}
-                onClose={() => router.toPopout()}
-                header='Вопрос значит'
-                text='Вас роняли в детстве?'
-            />
-        )
-    }
-
-    async function openSpinner() {
-        router.toPopout(<ScreenSpinner/>)
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        router.toPopout()
-    }
-
-    function openSnackbar() {
-        setSnackbar(
-            <Snackbar
-                layout='vertical'
-                onClose={() => setSnackbar(null)}
-                action='Например кнопка'
-                before={
-                    <Avatar size={24} style={{ background: 'var(--accent)' }}> 
-                        <Icon16Done fill='#fff'/> 
-                    </Avatar>
-                }
-            >
-                Какой-то текст
-            </Snackbar>
-        )
+    function openInfo(data) {
+        dispatch(set({key: 'infoProduct', value: data}))
+        router.toPanel('infoProduct')
     }
 
     return (
         <>
-            <PanelHeader separator={false}>Главная</PanelHeader>
-            <Group>
-                <Div>
-                    <Button 
-                        size="l" 
-                        stretched
-                        mode="secondary" 
-                        onClick={() => router.toPanel('placeholder')}
-                    >
-                        Открыть Panel
-                    </Button>
-                </Div>
-
-                <Div>
-                    <Button 
-                        size="l" 
-                        stretched
-                        mode="secondary" 
-                        onClick={() => openAlert()}
-                    >
-                        Открыть Alert
-                    </Button>
-                </Div>
-
-                <Div>
-                    <Button 
-                        size="l" 
-                        stretched
-                        mode="secondary" 
-                        onClick={() => openSpinner()}
-                    >
-                        Открыть ScreenSpinner
-                    </Button>
-                </Div>
-
-                <Div>
-                    <Button
-                        size="l" 
-                        stretched
-                        mode="secondary" 
-                        onClick={() => openSnackbar()}
-                    >
-                        Открыть Snackbar
-                    </Button>
-                </Div>
-
-                <Div>
-                    <Button 
-                        size="l" 
-                        stretched
-                        mode="secondary" 
-                        onClick={() => router.toModal('botsList')}
-                    >
-                        Открыть ModalPage
-                    </Button>
-                </Div>
-
-                {showImg && 
-                    <Div className='div-center'>
-                        <img src={img} alt="чел"/>
-                    </Div>
-                }
-            </Group>
-            {snackbar}
+        <PanelHeader
+            left={
+                <PanelHeaderButton>
+                    <Icon28UserStarBadgeOutline/>
+                </PanelHeaderButton>
+            }
+        >
+            Товары
+        </PanelHeader>
+        <Group>
+            <div className='products'>
+                {products.map((el) => {
+                    return(
+                        <Div
+                            onClick={() => openInfo(el)}
+                            style={{marginLeft: 0, marginRight: 0}}
+                        >
+                            <div>
+                                <Avatar
+                                    size={150}
+                                    src={el.photo}
+                                    mode='image'
+                                />
+                            </div>
+                            <Headline
+                                weight='medium'
+                                style={{marginBottom: 0, marginTop: 5}}
+                            >
+                                {el.price} {declOfNum(el.price, ["рубль", "рубля", "рублей"])}
+                            </Headline>
+                            <span className='test'>{el.name.length > 25 ? el.name.slice(0, 25) + '...' : el.name}</span>
+                        </Div>
+                    )
+                })}
+            </div>
+            <Footer>
+                Всего {products.length} {declOfNum(products.length, ["товар", "товара", "товаров"])}
+            </Footer>
+        </Group>
         </>
-    );
+    )
 }
 
-export default withRouter(HomePanelBase);
+export default withRouter(Market)

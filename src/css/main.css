@@ -40,3 +40,33 @@ body[scheme=vkcom_dark] .vkuiGradient--md-tint.vkuiGradient--to-top {
     margin-bottom: 24px;
     color: var(--text_secondary)
 }
+
+.vkuiTabbarItem--selected {
+    padding: 0;
+}
+
+.products {
+    display: flex;
+    flex-wrap: wrap;
+    justify-items: center;
+    justify-content: center;
+}
+
+
+
+
+
+.test {
+    font-size: 13px;
+    line-height: 16px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #818c99;
+    color: var(--text_secondary);
+}
+
+.placeholder {
+    margin-top: calc(100% / 3);
+}

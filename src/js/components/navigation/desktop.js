@@ -9,8 +9,11 @@ import {
 	Group,
 	Cell
 } from '@vkontakte/vkui';
-import ThemeControllers from './themeControllers';
-import { Icon28HomeOutline, Icon28Profile } from '@vkontakte/icons';
+import {
+    Icon28MarketOutline,
+    Icon28ShoppingCartOutline,
+    Icon28StorefrontOutline
+} from '@vkontakte/icons';
 
 function DesktopNavigation({ router }) {
   const hasHeader = useSelector((state) => state.main.hasHeader)
@@ -23,23 +26,30 @@ function DesktopNavigation({ router }) {
           <Cell
             onClick={() => router.toView('home')}
             disabled={router.activeView === 'home'}
-            before={<Icon28HomeOutline/>}
+            before={<Icon28StorefrontOutline/>}
             className={router.activeView === 'home' ? 'activeViewCell' : ''}
           >
-            Главная
+            Товары
           </Cell>
 
           <Cell
-            onClick={() => router.toView('profile')}
-            disabled={router.activeView === 'profile'}
-            before={<Icon28Profile/>}
-            className={router.activeView === 'profile' ? 'activeViewCell' : ''}
+            onClick={() => router.toView('cart')}
+            disabled={router.activeView === 'cart'}
+            before={<Icon28ShoppingCartOutline/>}
+            className={router.activeView === 'cart' ? 'activeViewCell' : ''}
           >
-            Профиль
+            Корзина
           </Cell>
-        </Group>
 
-        <ThemeControllers/>
+            <Cell
+                onClick={() => router.toView('orders')}
+                disabled={router.activeView === 'orders'}
+                before={<Icon28MarketOutline/>}
+                className={router.activeView === 'orders' ? 'activeViewCell' : ''}
+            >
+                Заказы
+            </Cell>
+        </Group>
       </Panel>
     </SplitCol>
 	)
