@@ -3,7 +3,8 @@ import { withRouter } from '@reyzitwo/react-router-vkminiapps';
 
 import {
 	Tabbar,
-	TabbarItem
+	TabbarItem,
+	Counter
 } from '@vkontakte/vkui';
 import {
 	Icon28MarketOutline,
@@ -11,7 +12,7 @@ import {
 	Icon28StorefrontOutline
 } from '@vkontakte/icons';
 
-function MobailNavigation({ router }) {
+function MobailNavigation({ router, count }) {
 
 	function openView(view) {
 		let nowView = router.activeView
@@ -35,6 +36,12 @@ function MobailNavigation({ router }) {
 	        selected={router.activeView === 'cart'}
 			onClick={() => openView('cart')}
 	        text='Корзина'
+			indicator={
+				count !== 0 &&
+					<Counter size='s' mode='primary'>
+						{count}
+					</Counter>
+			}
 	      ><Icon28ShoppingCartOutline/></TabbarItem>
 
 			<TabbarItem

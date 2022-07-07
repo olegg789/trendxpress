@@ -13,24 +13,25 @@ import {
     Button,
 } from "@vkontakte/vkui";
 import {set} from "../../reducers/mainReducer";
-import {Icon28CheckCircleOutline} from "@vkontakte/icons";
 
-function InfoProduct({ router, storage, declOfNum, dispatch, count, setCount, openSnackbarCart }) {
+function InfoProductCart({ router, openSnackbarCart,  storage, declOfNum, dispatch }) {
 
     function addToCart(data) {
         let res = JSON.parse(localStorage.getItem('cart'))
-        setCount(count + 1)
+        console.log(res)
         if (res.length !== 0) {
             let items = res
             items.unshift(data)
             items = JSON.stringify(items)
             localStorage.setItem('cart', items)
+            console.log(storage.cart)
         }
         else {
             let items = []
             items.unshift(data)
             items = JSON.stringify(items)
             localStorage.setItem('cart', items)
+            console.log(localStorage.getItem('cart'))
         }
         openSnackbarCart()
     }
@@ -46,23 +47,24 @@ function InfoProduct({ router, storage, declOfNum, dispatch, count, setCount, op
 
             <Group>
                 <Gallery
+
                 >
-                    <img src={storage.infoProduct.url} alt=''/>
+                    <img src={storage.infoProductCart.url} alt=''/>
                 </Gallery>
 
                 <Div style={{marginTop: 15}}>
                     <Headline weight='regular' style={{fontSize: 20}}>
-                        {storage.infoProduct.name}
+                        {storage.infoProductCart.name}
                     </Headline>
                     <Headline weight='medium' style={{fontSize: 20, marginTop: 10}}>
-                        {storage.infoProduct.price}₽
+                        {storage.infoProductCart.price}₽
                     </Headline>
                 </Div>
 
                 <Separator/>
 
                 <Div style={{whiteSpace: 'pre-line'}}>
-                    {storage.infoProduct.description}
+                    {storage.infoProductCart.description}
                 </Div>
 
                 <FixedLayout vertical='bottom' filled>
@@ -70,7 +72,7 @@ function InfoProduct({ router, storage, declOfNum, dispatch, count, setCount, op
                         <Button
                             size='l'
                             stretched
-                            onClick={() => addToCart(storage.infoProduct)}
+                            onClick={() => addToCart(storage.infoProductCart)}
                         >
                             Добавить в корзину
                         </Button>
@@ -81,4 +83,4 @@ function InfoProduct({ router, storage, declOfNum, dispatch, count, setCount, op
     )
 }
 
-export default withRouter(InfoProduct);
+export default withRouter(InfoProductCart);

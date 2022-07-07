@@ -11,6 +11,16 @@ const structure = [
 			{
 				id: "infoProduct",
 				hash: '/placeholder'
+			},
+
+			{
+				id: 'addItem',
+				hash: ''
+			},
+
+			{
+				id: 'admin',
+				hash: ''
 			}
 		]
 	},
@@ -22,6 +32,16 @@ const structure = [
 			{
 				id: "base",
 				hash: '/base'
+			},
+
+			{
+				id: "infoProductCart",
+				hash: "/"
+			},
+
+			{
+				id: "newOrder",
+				hash: "/"
 			}
 		]
 	},

@@ -70,3 +70,11 @@ body[scheme=vkcom_dark] .vkuiGradient--md-tint.vkuiGradient--to-top {
 .placeholder {
     margin-top: calc(100% / 3);
 }
+
+.count_cart {
+    color: var(--text_secondary)
+}
+
+.snack_suc {
+    color: var(--dynamic_green)
+}

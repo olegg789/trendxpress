@@ -1,39 +1,52 @@
 import React, {useEffect, useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
-import {Avatar, Button, Group, Header, PanelHeader, Placeholder, Separator, SimpleCell} from "@vkontakte/vkui";
+import {
+    Avatar,
+    Button, Div,
+    FixedLayout,
+    Group,
+    Header,
+    PanelHeader,
+    Placeholder,
+    Separator,
+    SimpleCell
+} from "@vkontakte/vkui";
 import {Icon28ShoppingCartOutline} from "@vkontakte/icons";
+import {set} from "../../reducers/mainReducer";
+import declOfNum from "../../components/declOfNum";
 
-function Cart({router, cart, isDesktop, storage}) {
+function Cart({router, isDesktop, storage, dispatch, checkCart, setCount}) {
 
     const [price, setPrice] = useState(0)
+    const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')))
 
-    function calc(data) {
-        if (storage.cart === undefined || JSON.parse(storage.cart).length === 0) {
+    function openInfo(data) {
+        dispatch(set({key: 'infoProductCart', value: data}))
+        router.toPanel('infoProductCart')
+    }
+
+    function calc() {
+        if (JSON.parse(localStorage.getItem('cart')).length !== 0) {
+            const count = JSON.parse(localStorage.getItem('cart')).length - 1
+            console.log(count)
             let res = 0
-            for (let i = 0; i <= JSON.parse(localStorage.getItem('cart')).length; i++) {
-                res = res + JSON.parse(localStorage.getItem('cart'))[i].price
+            for (let i=0;i<=count;i++) {
+                console.log(JSON.parse(localStorage.getItem('cart'))[i])
+                res = res + Number(JSON.parse(localStorage.getItem('cart'))[i].price)
             }
-
-            setPrice(res)
-        } else {
-            let res = 0
-            for (let i = 0; i <= JSON.parse(storage.cart).length; i++) {
-                res = res + JSON.parse(storage.cart)[i].price
-            }
-
             setPrice(res)
         }
     }
 
     useEffect(() => {
-        //calc()
+        calc()
     }, [])
 
     return(
         <>
             <PanelHeader>Корзина</PanelHeader>
             <Group>
-                {(cart === null && storage.cart === undefined) ?
+                {cart.length === 0 ?
                     <Placeholder
                         header="Кажется, здесь ещё ничего нет!"
                         icon={<Icon28ShoppingCartOutline width={56} height={56}/>}
@@ -52,45 +65,66 @@ function Cart({router, cart, isDesktop, storage}) {
                     </Placeholder> :
                     <>
                         <Header>Ваша корзина</Header>
-                        {storage.cart === undefined || JSON.parse(storage.cart).length === 0 ?
-                        <>
-                        {JSON.parse(localStorage.getItem('cart')).map((el) => {
-                            return(
-                                <>
-                                <SimpleCell
-                                    before={
-                                        <Avatar size={48} mode='image' src={el.photo}/>
-                                    }
-                                    after={el.price}
-                                    >
-                                        {el.name}
-                                </SimpleCell>
-                                <Separator/>
-                                </>
-                            )
-                        })}
 
-                            <SimpleCell
-                            >
-                                К оплате
-                            </SimpleCell>
-                        </>
-                        :
-                        JSON.parse(storage.cart).map((el) => {
+                        {JSON.parse(localStorage.getItem('cart')).map((el) => {
                         return(
                         <>
                         <SimpleCell
                             before={
-                                <Avatar size={32} mode='image' src={el.photo}/>
+                                <Avatar size={75} mode='image' src={el.photo}/>
                             }
-                            after={el.price}
+                            after={<span className='count_cart'>{el.price}₽</span>}
+                            style={{marginBottom: 5}}
+                            onClick={() => {
+                                openInfo(el)
+                            }}
                         >
                             {el.name}
                         </SimpleCell>
-                        <Separator/>
                         </>
                         )
                     })}
+                        <Div>
+                            <Button
+                                mode='secondary'
+                                onClick={() => {
+                                    setCart([])
+                                    localStorage.setItem('cart', "[]")
+                                    setCount(0)
+                                }
+                                }
+                                size='m'
+                            >
+                                Очистить корзину
+                            </Button>
+                        </Div>
+
+                        <FixedLayout vertical='bottom' filled>
+                            <Separator wide/>
+                            <Header mode='secondary'>Итого</Header>
+                            <SimpleCell
+                                disabled
+                                after={
+                                    <span className='count_cart'>
+                                        {JSON.parse(localStorage.getItem('cart')).length} {declOfNum(JSON.parse(localStorage.getItem('cart')).length, ["товар", "товара", "товаров"])}
+                                    </span>
+                                }
+                            >
+                                {price}₽
+                            </SimpleCell>
+                            <Div>
+                                <Button
+                                    size='l'
+                                    stretched
+                                    onClick={() => {
+                                        dispatch(set({key: 'price', value: price}))
+                                        router.toPanel('newOrder')
+                                    }}
+                                >
+                                    Перейти к оформлению
+                                </Button>
+                            </Div>
+                        </FixedLayout>
                     </>
                 }
             </Group>
