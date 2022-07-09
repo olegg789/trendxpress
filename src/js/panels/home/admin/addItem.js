@@ -62,7 +62,6 @@ function AddItem({router, getMarket, openSnackbar}) {
                 }
             )
             if (res.response) {
-                console.log('УРА')
                 router.toBack()
                 getMarket()
                 openSnackbar('Товар добавлен!', <Icon28CheckCircleOutline className='snack_suc'/>)
@@ -90,7 +89,7 @@ function AddItem({router, getMarket, openSnackbar}) {
         </PanelHeader>
             <Group>
                 <FormLayout id='createItem'>
-                    <FormItem top='Название'>
+                    <FormItem top='Название' style={{marginTop: -10}}>
                         <Input
                             value={name}
                             onChange={(e) => {
@@ -102,7 +101,7 @@ function AddItem({router, getMarket, openSnackbar}) {
                         />
                     </FormItem>
 
-                    <FormItem top='Описание'>
+                    <FormItem top='Описание' style={{marginTop: -10}}>
                         <Textarea
                             value={description}
                             onChange={(e) => {
@@ -112,7 +111,7 @@ function AddItem({router, getMarket, openSnackbar}) {
                         />
                     </FormItem>
 
-                    <FormItem top='Цена'>
+                    <FormItem top='Цена' style={{marginTop: -10}}>
                         <Input
                             value={price}
                             onChange={(e) => {
@@ -125,7 +124,7 @@ function AddItem({router, getMarket, openSnackbar}) {
                         />
                     </FormItem>
 
-                    <FormItem top='Фото товара'>
+                    <FormItem top='Фото товара' style={{marginTop: -10}}>
                         <File
                             name="photo"
                             before={

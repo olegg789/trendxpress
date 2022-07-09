@@ -72,51 +72,54 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
         <>
         <PanelHeader separator={storage.isDesktop} left={<PanelHeaderBack onClick={() => router.toBack()}/> }>Новый заказ</PanelHeader>
             <Group>
-                <FormLayout style={{marginBottom: 120}}>
-                    <FormItem top='Адрес доставки'>
-                        <Textarea
-                            placeholder='г. Санкт-Петербург, Невский проспект, д. 28, БЦ "Зингеръ"'
-                            value={address}
-                            onChange={(e) => setAddress(e.currentTarget.value)}
-                        />
-                    </FormItem>
+                <div style={{marginBottom: 200}}>
+                    <FormLayout>
+                        <FormItem top='Адрес доставки'>
+                            <Textarea
+                                placeholder='г. Санкт-Петербург, Невский проспект, д. 28, БЦ "Зингеръ"'
+                                value={address}
+                                onChange={(e) => setAddress(e.currentTarget.value.replace(/^\s+/g, ''))}
+                            />
+                        </FormItem>
 
-                    <FormItem top='Получатель'>
-                        <Input
-                            placeholder='Иванов Иван Иванович'
-                            value={recipient}
-                            onChange={(e) => setRecipient(e.currentTarget.value)}
-                        />
-                    </FormItem>
+                        <FormItem top='Получатель'>
+                            <Input
+                                placeholder='Иванов Иван Иванович'
+                                value={recipient}
+                                onChange={(e) => setRecipient(e.currentTarget.value.replace(/^\s+/g, ''))}
+                            />
+                        </FormItem>
 
-                    <FormItem top='Телефон'>
-                        <Input
-                            placeholder='70000000000'
-                            type='number'
-                            maxLength={11}
-                            value={phone}
-                            onChange={(e) => {
-                                if (e.currentTarget.value.length > 11) return
-                                setPhone(e.currentTarget.value)
-                            }}
-                        />
-                    </FormItem>
+                        <FormItem top='Телефон'>
+                            <Input
+                                placeholder='70000000000'
+                                type='number'
+                                maxLength={11}
+                                value={phone}
+                                onChange={(e) => {
+                                    if (e.currentTarget.value.length > 11) return
+                                    setPhone(e.currentTarget.value.replace(/^\s+/g, ''))
+                                }}
+                                name='phone'
+                            />
+                        </FormItem>
 
-                    <FormItem top='Электронная почта'>
-                        <Input
-                            placeholder='ivanIvanov@gmail.com'
-                            value={email}
-                            onChange={(e) => setEmail(e.currentTarget.value)}
-                        />
-                    </FormItem>
+                        <FormItem top='Электронная почта'>
+                            <Input
+                                placeholder='ivanIvanov@gmail.com'
+                                value={email}
+                                onChange={(e) => setEmail(e.currentTarget.value.replace(/^\s+/g, ''))}
+                            />
+                        </FormItem>
 
-                    <FormItem top='Комментарий (необязательно)'>
-                        <Textarea
-                            value={comment}
-                            onChange={(e) => setComment(e.currentTarget.value)}
-                        />
-                    </FormItem>
-                </FormLayout>
+                        <FormItem top='Комментарий (необязательно)'>
+                            <Textarea
+                                value={comment}
+                                onChange={(e) => setComment(e.currentTarget.value.replace(/^\s+/g, ''))}
+                            />
+                        </FormItem>
+                    </FormLayout>
+                </div>
 
                 <FixedLayout vertical='bottom' filled>
                     <Separator wide/>
@@ -137,7 +140,7 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                             stretched
                             onClick={() => newOrder()}
                             disabled={
-                                address.length === 0 || recipient.length === 0 || email.length === 0 || phone.length === 0
+                                address.length === 0 || recipient.length === 0 || email.length === 0 || phone.length !== 11
                             }
                         >
                             Оформить заказ

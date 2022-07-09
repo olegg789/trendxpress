@@ -1,13 +1,14 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useRef, useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
-    Avatar,
-    Div,
+    CardGrid,
     Group,
-    Headline,
     PanelHeader,
     PanelHeaderButton,
-    Placeholder, Search, Spinner,
+    Placeholder,
+    Search,
+    Spinner,
+    ContentCard
 } from "@vkontakte/vkui";
 import {Icon28UserStarBadgeOutline} from "@vkontakte/icons";
 import {useDispatch} from "react-redux";
@@ -15,34 +16,50 @@ import {set} from "../../reducers/mainReducer";
 import {InfScroll} from "@vkma/infscroll";
 import api from "../../components/apiFunc";
 
-function Market({router, products, setMarket, admin, getMarket, storage}) {
+function Market({router, products, setMarket, admin, getMarket, storage, loading}) {
     const dispatch = useDispatch()
 
     const [need, setNeed] = useState(true)
+    const [result, setResult] = useState(true)
 
     function openInfo(data) {
         dispatch(set({key: 'infoProduct', value: data}))
         router.toPanel('infoProduct')
     }
 
-    async function search(query) {
-        try {
-            let res = await api(`items?query=${query}`, 'GET')
-            if (res.response) {
-                if (res.items.length === 0) {
-                    return
-                }
+    const search = useDebounce(async (query) => {
+        if (query.length === 0) {
+            getMarket()
+            setNeed(true)
+            return
+        }
+        let res = await api(`items?query=${query}`, 'GET')
+        if (res.response) {
+            if (res.items.length === 0) {
+                setResult(false)
+            }
+            else {
+                setResult(true)
                 setMarket(res.items)
             }
         }
-        catch (err) {
-            console.log(err)
-        }
-    }
+    }, 1000);
 
-    useEffect(() => {
-        getMarket()
-    }, [])
+    function useDebounce(callback, delay) {
+        const timer = useRef(null);
+        const debouncedCallback = useCallback(
+            (...args) => {
+                if (timer.current) {
+                    clearTimeout(timer.current);
+                }
+                timer.current = setTimeout(() => {
+                    callback(...args);
+                }, delay);
+            },
+            [callback, delay]
+        );
+        return debouncedCallback;
+    }
 
     return (
         <>
@@ -52,61 +69,49 @@ function Market({router, products, setMarket, admin, getMarket, storage}) {
                     <Icon28UserStarBadgeOutline/>
                 </PanelHeaderButton>
             }
-            separator={false}
+            separator={storage.isDesktop}
         >
             Товары
         </PanelHeader>
         <Group>
-            {products.length > 0 ?
+            {products.length > 0 || !loading ?
             <>
             <Search
+                value={storage.search}
                 onChange={(e) => {
-                    if (e.currentTarget.value.length === 0) {
-                        getMarket()
-                        setNeed(true)
-                        return
-                    }
-                    search(e.currentTarget.value)
+                    dispatch(set({key: 'search', value: e.currentTarget.value}))
+                    search(e.currentTarget.value.replace(/^\s+/g, ''))
                     setNeed(false)
                 }}
+                style={{marginBottom: 10}}
             />
+                {result ?
+                    <InfScroll
+                        onReachEnd={() => {need && getMarket(products.length)}}
+                        loader={need ? <Spinner size="regular" style={{ height: 60 }}/> : null}
+                    >
+                        <CardGrid size='l' className='products'>
+                            {products.map((el) => {
+                                return(
+                                    <ContentCard
+                                        onClick={() => openInfo(el)}
+                                        src={el.url}
+                                        header={el.price + '₽'}
+                                        text={el.name}
+                                        maxHeight={300}
+                                    />
+                                )
+                            })}
 
-            <InfScroll
-                onReachEnd={() => {need && getMarket(products.length)}}
-                loader={need ? <Spinner size="regular" style={{ height: 60 }}/> : null}
-            >
-                <div className='products'>
-                        {products.map((el) => {
-                            return(
-                                <Div
-                                    onClick={() => openInfo(el)}
-                                    style={{marginLeft: 0, marginRight: 0, cursor: 'pointer'}}
-                                    className={storage.isDesktop ? 'product_web' : 'product'}
-                                >
-                                    <div>
-                                        <Avatar
-                                            size={150}
-                                            src={el.url}
-                                            mode='image'
-                                        />
-                                    </div>
-                                    <Headline
-                                        weight='medium'
-                                        style={{marginBottom: 0, marginTop: 5}}
-                                    >
-                                        {el.price}₽
-                                    </Headline>
-                                    <span className='test'>{el.name.length > 20 ? el.name.slice(0, 20) + '...' : el.name}</span>
-                                </Div>
-                            )
-                        })}
+                        </CardGrid>
+                    </InfScroll> :
+                    <Placeholder>
+                        Ничего не найдено
+                    </Placeholder>
+                }
 
-                </div>
-            </InfScroll>
             </> :
-                <Placeholder>
-                    Пусто
-                </Placeholder>
+                <Spinner style={{marginTop: 10}}/>
             }
         </Group>
         </>

@@ -4,11 +4,12 @@ import {
     Group,
     PanelHeader,
     Tabs,
-    TabsItem
+    TabsItem,
+    PullToRefresh
 } from "@vkontakte/vkui";
 import OrdersList from "./orderslist";
 
-function Orders({router, isDesktop, storage, dispatch}) {
+function Orders({router, isDesktop, storage, dispatch, getOrders}) {
     const [activeTab, setActiveTab] = useState(0)
     const [filter, setFilter] = useState([])
 
@@ -40,7 +41,8 @@ function Orders({router, isDesktop, storage, dispatch}) {
     return(
         <>
             <PanelHeader separator={storage.isDesktop}>Заказы</PanelHeader>
-            <Group>
+            <PullToRefresh onRefresh={() => getOrders()}>
+                <Group>
                     <Tabs>
                         <TabsItem
                             selected={activeTab === 0}
@@ -61,8 +63,10 @@ function Orders({router, isDesktop, storage, dispatch}) {
                             Завершены
                         </TabsItem>
                     </Tabs>
-                <OrdersList orders={filter} dispatch={dispatch}/>
-            </Group>
+                    <OrdersList orders={filter} dispatch={dispatch}/>
+                </Group>
+            </PullToRefresh>
+
         </>
     )
 }

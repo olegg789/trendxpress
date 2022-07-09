@@ -50,30 +50,52 @@ body[scheme=vkcom_dark] .vkuiGradient--md-tint.vkuiGradient--to-top {
 }
 
 .products {
-    display: flex;
-    justify-items: center;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    display: inline-flex;
+}
+
+.products .vkuiContentCard {
+    margin: 6px;
+    width: calc(50% - 12px);
+    cursor: pointer;
 }
 
 .product {
     width: 40%;
-    margin-left: -5px;
-    margin-right: 0;
     cursor: pointer;
+    margin-left: -5px;
     justify-items: center;
 }
 
 .product_web {
-    width: 30%;
-    margin-left: -20px;
-    margin-right: -20px;
+    width: 50%;
     cursor: pointer;
     justify-items: center;
+    justify-content: space-around;
+    display: flex;
+    flex-direction: column;
+    align-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 5px;
+    margin-right: -100px;
 }
 
-.products .product {
-    justify-content: space-around;
+.vkuiContentCard {
+    margin: 6px;
+    width: calc(50% - 12px);
+}
+
+.div_product {
+    width: 40%;
+}
+
+.products {
+    display: flex;
+    align-items: stretch;
+}
+
+.vkuiCardGrid--l .vkuiCard:not(:first-child) {
+    margin-top: 6px;
 }
 
 .test {
@@ -127,4 +149,31 @@ body[scheme=vkcom_dark] .vkuiGradient--md-tint.vkuiGradient--to-top {
     width: calc(100% + 16px);
     padding-bottom: 0px;
     border-radius: 50%;
+}
+
+.vkuiHeader {
+    user-select: none;
+}
+
+.vkuiTabs__in, .vkuiTabs .vkuiHorizontalScroll__in-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.header {
+    margin-top: -10px;
+    margin-bottom: -10px;
+}
+
+.name {
+    white-space: pre-line;
+}
+
+.vkuiTabs--vkcom .vkuiTabsItem--vkcom {
+    flex-grow: 0;
+    min-width: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 33%
 }

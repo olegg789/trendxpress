@@ -7,16 +7,15 @@ import {
     PanelHeader,
     PanelHeaderBack,
     Placeholder,
-    SimpleCell
+    SimpleCell, Spinner
 } from "@vkontakte/vkui";
 import {
-    Icon28EditOutline,
-    Icon28LinkCircleOutline
+    Icon28EditOutline, Icon28InfoCircleOutline,
 } from "@vkontakte/icons";
 import {set} from "../../../reducers/mainReducer";
 import {useSelector} from "react-redux";
 
-function ViewOrders({router, dispatch, getOrders, orders}) {
+function ViewOrders({router, dispatch, getOrders, orders, loading}) {
     const storage = useSelector((state) => state.main)
 
     const statuses = [
@@ -52,42 +51,44 @@ function ViewOrders({router, dispatch, getOrders, orders}) {
                 Управление заказами
             </PanelHeader>
             <Group>
-                {orders.length === 0 ?
-                <Placeholder header='Заказов ещё нет'/> :
-                    orders.map((el) => {
-                        const date = new Date(el.timestamp*1000).toLocaleString('ru', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric'
-                        });
-                        return(
-                            <FormItem top={'Заказ от ' + date} bottom={'Статус: ' + statuses[el.status]}>
-                                <SimpleCell
-                                    style={{marginTop: -10, marginBottom: -10}}
-                                    disabled
-                                    after={
-                                        <>
-                                            <IconButton
-                                                icon={<Icon28EditOutline/>}
-                                                onClick={() => editStatus(el)}
-                                            />
-                                            <IconButton
-                                            onClick={() => openInfo(el)}
-                                            icon={<Icon28LinkCircleOutline/>}
-                                        />
-                                        </>
+                {loading ?
+                    <Spinner/> :
+                    orders.length === 0 ?
+                            <Placeholder header='Заказов ещё нет'/> :
+                            orders.map((el) => {
+                                const date = new Date(el.timestamp*1000).toLocaleString('ru', {
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric'
+                                });
+                                return(
+                                    <FormItem top={'Заказ от ' + date} bottom={'Статус: ' + statuses[el.status]}>
+                                        <SimpleCell
+                                            style={{marginTop: -10, marginBottom: -10}}
+                                            disabled
+                                            after={
+                                                <>
+                                                    <IconButton
+                                                        icon={<Icon28EditOutline/>}
+                                                        onClick={() => editStatus(el)}
+                                                        style={{marginRight: 10}}
+                                                    />
+                                                    <IconButton
+                                                        onClick={() => openInfo(el)}
+                                                        icon={<Icon28InfoCircleOutline/>}
+                                                    />
+                                                </>
 
-                                    }
-                                >
-                                    Заказ №{el.id} <br/>
-                                    Товаров в заказе: {el.items.length} <br/>
-                                    Сумма: {el.amount}₽
-                                </SimpleCell>
-                            </FormItem>
-                        )
-                    })
+                                            }
+                                        >
+                                            Заказ №{el.id} <br/>
+                                            Товаров в заказе: {el.items.length} <br/>
+                                            Сумма: {el.amount}₽
+                                        </SimpleCell>
+                                    </FormItem>
+                                )
+                            })
                 }
             </Group>
         </>

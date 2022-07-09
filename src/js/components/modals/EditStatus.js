@@ -1,11 +1,11 @@
 import React, {useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {Button, Div, IOS, ModalPage, ModalPageHeader, PanelHeaderButton, Radio} from "@vkontakte/vkui";
-import {Icon24Cancel, Icon24Dismiss} from "@vkontakte/icons";
+import {Icon24Cancel, Icon24Dismiss, Icon28CheckCircleOutline} from "@vkontakte/icons";
 import {useSelector} from "react-redux";
 import api from "../apiFunc";
 
-function EditStatus({router, storage, nav, getOrders, getOrdersAdmin}) {
+function EditStatus({router, storage, nav, getOrders, getOrdersAdmin, openSnackbar}) {
     const platform = useSelector((state) => state.main.platform)
 
     const [status, setStatus] = useState(storage.orderStatus.status)
@@ -29,6 +29,7 @@ function EditStatus({router, storage, nav, getOrders, getOrdersAdmin}) {
                 router.toModal()
                 getOrders()
                 getOrdersAdmin()
+                openSnackbar('Статус заказа изменён!', <Icon28CheckCircleOutline className='snack_suc'/>)
             }
         }
         catch (err) {
@@ -41,7 +42,7 @@ function EditStatus({router, storage, nav, getOrders, getOrdersAdmin}) {
             nav={nav}
             header={
                 <ModalPageHeader
-                    left={platform !== IOS &&
+                    left={platform === 'android' &&
                     <PanelHeaderButton onClick={() => router.toBack()}>
                         <Icon24Cancel/>
                     </PanelHeaderButton>

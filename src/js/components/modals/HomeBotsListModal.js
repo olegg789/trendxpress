@@ -6,26 +6,24 @@ import {
     ModalPage,
     ModalPageHeader,
     PanelHeaderButton,
-    IOS, SimpleCell, Div, Card, Header, Button
+    IOS,
+    SimpleCell,
+    Div,
+    Card,
+    Header,
+    Button,
 } from "@vkontakte/vkui";
 import { Icon24Dismiss, Icon24Cancel } from '@vkontakte/icons'
-import {set} from "../../reducers/mainReducer";
 
 function OrderInfoAdmin({ nav, router, storage, dispatch }) {
     const platform = useSelector((state) => state.main.platform)
-
-    function openInfo(data) {
-        dispatch(set({key: 'infoProductOrderAdmin', value: data}))
-        router.toModal()
-        router.toPanel('infoProductOrderAdmin')
-    }
 
     return (
         <ModalPage
             nav={nav}
             header={
                 <ModalPageHeader
-                    left={platform !== IOS &&
+                    left={platform === 'android' &&
                     <PanelHeaderButton onClick={() => router.toBack()}>
                         <Icon24Cancel/>
                     </PanelHeaderButton>
@@ -46,33 +44,33 @@ function OrderInfoAdmin({ nav, router, storage, dispatch }) {
             <Div>
                 <Card>
                     <SimpleCell disabled>
-                        <span>
+                        <span className='name'>
                             Получатель: {storage.orderInfoAdmin.recipient}
                         </span>
                     </SimpleCell>
                     <SimpleCell disabled style={{marginTop: -20}}>
-                        <span>
+                        <span className='name'>
                             Телефон: {storage.orderInfoAdmin.phone}
                         </span>
                     </SimpleCell>
                     <SimpleCell disabled style={{marginTop: -20}}>
-                        <span>
+                        <span className='name'>
                             Адрес: {storage.orderInfoAdmin.address}
                         </span>
                     </SimpleCell>
                     <SimpleCell disabled style={{marginTop: -20}}>
-                        <span>
+                        <span className='name'>
                             Почта: {storage.orderInfoAdmin.email}
                         </span>
                     </SimpleCell>
                     {storage.orderInfoAdmin.comment.length !== 0 &&
                     <SimpleCell disabled style={{marginTop: -20}}>
-                        <span>
+                        <span className='name'>
                             Комментарий: {storage.orderInfoAdmin.comment}
                         </span>
                     </SimpleCell>
                     }
-                    <Div style={{marginTop: -20}}>
+                    <Div style={{marginTop: -15}}>
                         <Button
                             mode='secondary'
                             stretched
@@ -87,7 +85,8 @@ function OrderInfoAdmin({ nav, router, storage, dispatch }) {
             </Div>
             <Header
                 mode='secondary'
-                aside={'Сумма: ' + storage.orderInfoAdmin.amount + '₽'}
+                aside={'Сумма: ' + storage.orderInfoAdmin.amount + ' ₽'}
+                className='header'
             >
                 Товары в заказе
             </Header>
@@ -98,11 +97,11 @@ function OrderInfoAdmin({ nav, router, storage, dispatch }) {
                             before={
                                 <Avatar size={75} mode='image' src={el.url}/>
                             }
-                            after={<span className='count_cart'>{el.price}₽</span>}
+                            after={<span className='count_cart'>{el.price} ₽</span>}
                             style={{marginBottom: 5}}
-                            onClick={() => openInfo(el)}
+                            disabled
                         >
-                            {el.name}
+                            <span className='name' style={{marginRight: 5}}>{el.name}</span>
                         </SimpleCell>
                     )
                 })

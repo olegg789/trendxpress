@@ -9,23 +9,16 @@ import {
     IOS, SimpleCell
 } from "@vkontakte/vkui";
 import { Icon24Dismiss, Icon24Cancel } from '@vkontakte/icons'
-import {set} from "../../reducers/mainReducer";
 
 function OrderInfo({ nav, router, storage, dispatch }) {
     const platform = useSelector((state) => state.main.platform)
-
-    function openInfo(data) {
-        dispatch(set({key: 'infoProductOrder', value: data}))
-        router.toModal()
-        router.toPanel('infoProductOrder')
-    }
 
     return (
         <ModalPage
             nav={nav}
             header={
                 <ModalPageHeader
-                    left={platform !== IOS && 
+                    left={platform === 'android' &&
                         <PanelHeaderButton onClick={() => router.toBack()}>
                             <Icon24Cancel/>
                         </PanelHeaderButton>
@@ -50,11 +43,11 @@ function OrderInfo({ nav, router, storage, dispatch }) {
                             before={
                                 <Avatar size={75} mode='image' src={el.url}/>
                             }
-                            after={<span className='count_cart'>{el.price}₽</span>}
+                            after={<span className='count_cart'>{el.price} ₽</span>}
                             style={{marginBottom: 5}}
-                            onClick={() => openInfo(el)}
+                            disabled
                         >
-                            {el.name}
+                            <span className='name' style={{marginRight: 5}}>{el.name}</span>
                         </SimpleCell>
                     )
                 })

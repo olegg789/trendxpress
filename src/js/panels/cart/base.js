@@ -5,13 +5,13 @@ import {
     Button, Div,
     FixedLayout,
     Group,
-    Header,
+    Header, IconButton,
     PanelHeader,
     Placeholder,
     Separator,
     SimpleCell
 } from "@vkontakte/vkui";
-import {Icon28ShoppingCartOutline} from "@vkontakte/icons";
+import {Icon28DeleteOutline, Icon28ShoppingCartOutline} from "@vkontakte/icons";
 import {set} from "../../reducers/mainReducer";
 import declOfNum from "../../components/declOfNum";
 
@@ -20,9 +20,11 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
     const [price, setPrice] = useState(0)
     const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')))
 
-    function openInfo(data) {
-        dispatch(set({key: 'infoProductCart', value: data}))
-        router.toPanel('infoProductCart')
+    function deleteFromCart(index) {
+        let arr = cart
+        arr.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(arr))
+        setCount(count - 1)
     }
 
     function calc() {
@@ -62,40 +64,49 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                         Добавь нужные товары в корзину и возвращайся снова!
                     </Placeholder> :
                     <>
-                        <Header>Ваша корзина</Header>
+                        <div style={{marginBottom: 150}}>
+                            <Header>Ваша корзина</Header>
 
-                        {JSON.parse(localStorage.getItem('cart')).map((el) => {
-                        return(
-                        <>
-                        <SimpleCell
-                            before={
-                                <Avatar size={75} mode='image' src={el.url}/>
-                            }
-                            after={<span className='count_cart'>{el.price}₽</span>}
-                            style={{marginBottom: 5}}
-                            onClick={() => {
-                                openInfo(el)
-                            }}
-                        >
-                            {el.name}
-                        </SimpleCell>
-                        </>
-                        )
-                    })}
-                        <Div>
-                            <Button
-                                mode='secondary'
-                                onClick={() => {
-                                    setCart([])
-                                    localStorage.setItem('cart', "[]")
-                                    setCount(0)
-                                }
-                                }
-                                size='m'
-                            >
-                                Очистить корзину
-                            </Button>
-                        </Div>
+                            {JSON.parse(localStorage.getItem('cart')).map((el, index) => {
+                                return(
+                                    <>
+                                        <SimpleCell
+                                            before={
+                                                <Avatar size={75} mode='image' src={el.url}/>
+                                            }
+                                            after={
+                                                <>
+                                                    <IconButton
+                                                        icon={<Icon28DeleteOutline className='snack_err'/>}
+                                                        onClick={() => deleteFromCart(index)}
+                                                    />
+                                                </>
+                                            }
+                                            style={{marginBottom: 5}}
+                                            disabled
+                                        >
+                                            <span className='name'>{el.name}</span> <br/>
+                                            <span className='count_cart'>{el.price} ₽</span>
+                                        </SimpleCell>
+                                    </>
+                                )
+                            })}
+                            <Div>
+                                <Button
+                                    mode='secondary'
+                                    onClick={() => {
+                                        setCart([])
+                                        localStorage.setItem('cart', "[]")
+                                        setCount(0)
+                                    }
+                                    }
+                                    size='m'
+                                >
+                                    Очистить корзину
+                                </Button>
+                            </Div>
+                        </div>
+
 
                         <FixedLayout vertical='bottom' filled>
                             <Separator wide/>

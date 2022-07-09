@@ -7,8 +7,7 @@ import {
     SimpleCell
 } from "@vkontakte/vkui";
 import {
-    Icon28CubeBoxOutline,
-    Icon28LinkCircleOutline
+    Icon28CubeBoxOutline, Icon28InfoCircleOutline,
 } from "@vkontakte/icons";
 import {set} from "../../reducers/mainReducer";
 
@@ -25,7 +24,6 @@ function OrdersList({router, orders, dispatch}) {
     function openInfo(data) {
         dispatch(set({key: 'orderInfo', value: data.items}))
         router.toModal('orderInfo')
-        console.log(data.items)
     }
 
     return (
@@ -38,7 +36,6 @@ function OrdersList({router, orders, dispatch}) {
             </Placeholder> :
                 orders.map((el) => {
                     const date = new Date(el.timestamp*1000).toLocaleString('ru', {
-                        year: 'numeric',
                         month: 'long',
                         day: 'numeric',
                         hour: 'numeric',
@@ -49,7 +46,7 @@ function OrdersList({router, orders, dispatch}) {
                             <SimpleCell
                                 style={{marginTop: -10, marginBottom: -10}}
                                 disabled
-                                after={<IconButton onClick={() => openInfo(el)} icon={<Icon28LinkCircleOutline/>}/> }
+                                after={<IconButton onClick={() => openInfo(el)} icon={<Icon28InfoCircleOutline/>}/> }
                             >
                                 Товаров в заказе: {el.items.length} <br/>
                                 Сумма: {el.amount}₽

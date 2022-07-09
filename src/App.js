@@ -28,7 +28,6 @@ import Market from "./js/panels/home/base";
 import InfoProduct from "./js/panels/home/placeholder";
 import Cart from "./js/panels/cart/base";
 import Orders from "./js/panels/orders/base";
-import InfoProductCart from "./js/panels/cart/infoProduct";
 import NewOrder from "./js/panels/cart/newOrder";
 import api from "./js/components/apiFunc";
 import AddItem from "./js/panels/home/admin/addItem";
@@ -36,10 +35,8 @@ import Admin from "./js/panels/home/admin/admin";
 import {Icon28CheckCircleOutline} from "@vkontakte/icons";
 import EditItem from "./js/panels/home/admin/editItem";
 import OrderInfo from "./js/components/modals/HomeBotInfoModal";
-import InfoProductOrder from "./js/panels/orders/infoProduct";
 import ViewOrders from "./js/panels/home/admin/viewOrders";
 import OrderInfoAdmin from "./js/components/modals/HomeBotsListModal";
-import InfoProductOrderAdmin from "./js/panels/home/admin/infoProductOrderAdmin";
 import EditStatus from "./js/components/modals/EditStatus";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
@@ -51,6 +48,9 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   const [admin, setAdmin] = useState(false)
   const [market, setMarket] = useState([])
   const [ordersAdmin, setOrdersAdmin] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [snackbar, setSnackbar] = useState(null)
+  const [loadingMain, setLoadingMain] = useState(true)
 
   const localstorage = localStorage
 
@@ -94,6 +94,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   }
 
   async function getMarket(offset) {
+    setLoadingMain(true)
     if (!offset) {
       let res = await api(`items`, 'GET')
       if (res.response) {
@@ -112,13 +113,14 @@ const App = withAdaptivity(({ viewWidth, router }) => {
         setMarket(items.reverse())
       }
     }
+    setLoadingMain(false)
     checkCart()
   }
 
-  function openSnackbar(text, icon, action) {
-    router.toPopout(
+  function openSnackbar(text, icon) {
+    setSnackbar(
         <Snackbar
-            onClose={() => router.toPopout()}
+            onClose={() => setSnackbar(null)}
             before={icon}
             className={mainStorage.isDesktop && 'snackbar'}
             duration={1500}
@@ -129,9 +131,9 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   }
 
   function openSnackbarCart() {
-    router.toPopout(
+    setSnackbar(
         <Snackbar
-            onClose={() => router.toPopout()}
+            onClose={() => setSnackbar(null)}
             before={<Icon28CheckCircleOutline className='snack_suc'/>}
             action='В корзину'
             onActionClick={() => {router.toView('cart'); router.toPopout()}}
@@ -157,9 +159,11 @@ const App = withAdaptivity(({ viewWidth, router }) => {
 
   async function getOrdersAdmin() {
     try {
+      setLoading(true)
       let res = await api('admin/orders', 'GET')
       if (res.response) {
         setOrdersAdmin(res.orders)
+        setLoading(false)
       }
     }
     catch (err) {
@@ -176,7 +180,13 @@ const App = withAdaptivity(({ viewWidth, router }) => {
     <ModalRoot activeModal={router.modal} onClose={() => router.toBack()}>
       <OrderInfoAdmin nav="orderInfoAdmin" storage={mainStorage} dispatch={(value) => dispatch(value)}/>
       <OrderInfo nav="orderInfo" storage={mainStorage} dispatch={(value) => dispatch(value)}/>
-      <EditStatus nav='editStatus' storage={mainStorage} getOrders={() => getOrders()} getOrdersAdmin={() => getOrdersAdmin()}/>
+      <EditStatus
+          nav='editStatus'
+          storage={mainStorage}
+          getOrders={() => getOrders()}
+          getOrdersAdmin={() => getOrdersAdmin()}
+          openSnackbar={(text, icon) => openSnackbar(text, icon)}
+      />
     </ModalRoot>
   );
 
@@ -191,8 +201,8 @@ const App = withAdaptivity(({ viewWidth, router }) => {
           <SplitCol
             animate={!mainStorage.isDesktop}
             spaced={mainStorage.isDesktop}
-            width={mainStorage.isDesktop ? '500px' : '100%'}
-            maxWidth={mainStorage.isDesktop ? '500px' : '100%'}
+            width={mainStorage.isDesktop ? '660px' : '100%'}
+            maxWidth={mainStorage.isDesktop ? '650px' : '100%'}
           >   
             <Epic 
               activeStory={router.activeView} 
@@ -213,7 +223,9 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                         admin={admin}
                         getMarket={(offset) => getMarket(offset)}
                         setMarket={(value) => setMarket(value)}
+                        loading={loadingMain}
                     />
+                  {snackbar}
                 </Panel>
 
                 <Panel id='infoProduct'>
@@ -229,6 +241,12 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       openSnackbar={(text, icon) => openSnackbar(text, icon)}
                       getMarket={(offset) => getMarket(offset)}
                   />
+                  {snackbar}
+                </Panel>
+
+                <Panel id='admin'>
+                  <Admin/>
+                  {snackbar}
                 </Panel>
 
                 <Panel id='addItem'>
@@ -236,6 +254,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       getMarket={(offset) => getMarket(offset)}
                       openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
                   />
+                  {snackbar}
                 </Panel>
 
                 <Panel id='editItem'>
@@ -244,6 +263,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
                       storage={mainStorage}
                   />
+                  {snackbar}
                 </Panel>
 
                 <Panel id='viewOrders'>
@@ -251,27 +271,11 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       dispatch={(value) => dispatch(value)}
                       getOrders={() => getOrdersAdmin()}
                       orders={ordersAdmin}
+                      loading={loading}
                   />
+                  {snackbar}
                 </Panel>
 
-                <Panel id='infoProductOrderAdmin'>
-                  <InfoProductOrderAdmin
-                      storage={mainStorage}
-                      declOfNum={(number, words) => declOfNum(number, words)}
-                      localstorage={localstorage}
-                      dispatch={(value) => dispatch(value)}
-                      count={count}
-                      setCount={(value) => setCount(value)}
-                      openSnackbarCart={() => openSnackbarCart()}
-                      admin={admin}
-                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
-                      getMarket={(offset) => getMarket(offset)}
-                  />
-                </Panel>
-
-                <Panel id='admin'>
-                  <Admin/>
-                </Panel>
               </View>
 
               <View 
@@ -290,21 +294,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                         setCount={(value) => setCount(value)}
                         count={count}
                     />
-                </Panel>
-
-                <Panel id='infoProductCart'>
-                  <InfoProductCart
-                      storage={mainStorage}
-                      declOfNum={(number, words) => declOfNum(number, words)}
-                      localstorage={localstorage}
-                      dispatch={(value) => dispatch(value)}
-                      count={count}
-                      setCount={(value) => setCount(value)}
-                      openSnackbarCart={() => openSnackbarCart()}
-                      admin={admin}
-                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
-                      getMarket={(offset) => getMarket(offset)}
-                  />
+                  {snackbar}
                 </Panel>
 
                 <Panel id='newOrder'>
@@ -315,6 +305,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       setCount={(value) => setCount(value)}
                       getOrders={() => getOrders()}
                   />
+                  {snackbar}
                 </Panel>
 
               </View>
@@ -330,23 +321,11 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       isDesktop={mainStorage.isDesktop}
                       storage={mainStorage}
                       dispatch={(value) => dispatch(value)}
+                      getOrders={() => getOrders()}
                   />
+                  {snackbar}
                 </Panel>
 
-                <Panel id='infoProductOrder'>
-                  <InfoProductOrder
-                      storage={mainStorage}
-                      declOfNum={(number, words) => declOfNum(number, words)}
-                      localstorage={localstorage}
-                      dispatch={(value) => dispatch(value)}
-                      count={count}
-                      setCount={(value) => setCount(value)}
-                      openSnackbarCart={() => openSnackbarCart()}
-                      admin={admin}
-                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
-                      getMarket={(offset) => getMarket(offset)}
-                  />
-                </Panel>
               </View>
             </Epic>
           </SplitCol>

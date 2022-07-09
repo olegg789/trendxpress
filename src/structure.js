@@ -29,11 +29,6 @@ const structure = [
 			},
 
 			{
-				id: 'infoProductOrderAdmin',
-				hash: ''
-			},
-
-			{
 				id: 'viewOrders',
 				hash: ''
 			}
@@ -50,11 +45,6 @@ const structure = [
 			},
 
 			{
-				id: "infoProductCart",
-				hash: "/"
-			},
-
-			{
 				id: "newOrder",
 				hash: "/"
 			}
@@ -68,11 +58,6 @@ const structure = [
 			{
 				id: 'base',
 				hash: '/'
-			},
-
-			{
-				id: 'infoProductOrder',
-				hash: ''
 			}
 		]
 	}
