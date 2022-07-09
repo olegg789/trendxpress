@@ -21,6 +21,21 @@ const structure = [
 			{
 				id: 'admin',
 				hash: ''
+			},
+
+			{
+				id: 'editItem',
+				hash: ''
+			},
+
+			{
+				id: 'infoProductOrderAdmin',
+				hash: ''
+			},
+
+			{
+				id: 'viewOrders',
+				hash: ''
 			}
 		]
 	},
@@ -53,6 +68,11 @@ const structure = [
 			{
 				id: 'base',
 				hash: '/'
+			},
+
+			{
+				id: 'infoProductOrder',
+				hash: ''
 			}
 		]
 	}

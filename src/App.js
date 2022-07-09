@@ -14,7 +14,7 @@ import {
   ModalRoot,
   usePlatform,
   VKCOM,
-  withAdaptivity, Snackbar,
+  withAdaptivity, Snackbar, ScreenSpinner,
 } from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 import declOfNum from "./js/components/declOfNum";
@@ -24,8 +24,6 @@ import { set } from './js/reducers/mainReducer';
 import DesktopNavigation from './js/components/navigation/desktop';
 import MobailNavigation from './js/components/navigation/mobail';
 
-import HomeBotsListModal from './js/components/modals/HomeBotsListModal';
-import HomeBotInfoModal from './js/components/modals/HomeBotInfoModal';
 import Market from "./js/panels/home/base";
 import InfoProduct from "./js/panels/home/placeholder";
 import Cart from "./js/panels/cart/base";
@@ -36,6 +34,13 @@ import api from "./js/components/apiFunc";
 import AddItem from "./js/panels/home/admin/addItem";
 import Admin from "./js/panels/home/admin/admin";
 import {Icon28CheckCircleOutline} from "@vkontakte/icons";
+import EditItem from "./js/panels/home/admin/editItem";
+import OrderInfo from "./js/components/modals/HomeBotInfoModal";
+import InfoProductOrder from "./js/panels/orders/infoProduct";
+import ViewOrders from "./js/panels/home/admin/viewOrders";
+import OrderInfoAdmin from "./js/components/modals/HomeBotsListModal";
+import InfoProductOrderAdmin from "./js/panels/home/admin/infoProductOrderAdmin";
+import EditStatus from "./js/components/modals/EditStatus";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
   const mainStorage = useSelector((state) => state.main)
@@ -45,42 +50,9 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   const [count, setCount] = useState(0)
   const [admin, setAdmin] = useState(false)
   const [market, setMarket] = useState([])
+  const [ordersAdmin, setOrdersAdmin] = useState([])
 
   const localstorage = localStorage
-  const cart = localstorage.getItem('cart')
-  const products = [
-    {
-      id: 0,
-      price: 150000,
-      name: 'MacBook Pro 13 M1 16/512',
-      description: 'fghgh\njhgfgyhj\nkjhgftyh\ngtyujkoiuy\njytfvhui',
-      photo: [
-          'https://www.notebookcheck-ru.com/uploads/tx_nbc2/2020-12-07_00_20_10-13__MacBook_Pro_kaufen_-_Apple__DE_.png'
-      ]
-    },
-    {
-      id: 1,
-      price: 1,
-      name: 'Macbook pro 15',
-      description: 'Курит каждый день\nЯ бы ему дал',
-      photo: ['https://sun7-7.userapi.com/s/v1/ig2/1qEavBZOdwuKu_remPVlGnMXqPpDxtS7VvWzHz2VVajG6wbfGdO4YLK4ShxDJ9F2BuSxewqRLp0htPtFiQaPrmqU.jpg?size=200x200&quality=95&crop=490,773,712,712&ava=1']
-    },
-    {
-      id: 2,
-      price: 1,
-      name: 'Савелий Хайруллин',
-      description: 'Курит каждый день\nЯ бы ему дал',
-      photo: ['https://sun7-7.userapi.com/s/v1/ig2/1qEavBZOdwuKu_remPVlGnMXqPpDxtS7VvWzHz2VVajG6wbfGdO4YLK4ShxDJ9F2BuSxewqRLp0htPtFiQaPrmqU.jpg?size=200x200&quality=95&crop=490,773,712,712&ava=1']
-    },
-    {
-      id: 3,
-      price: 1,
-      name: 'Ol Eg',
-      description: 'aboba',
-      photo: ['https://sun7-7.userapi.com/s/v1/ig2/1qEavBZOdwuKu_remPVlGnMXqPpDxtS7VvWzHz2VVajG6wbfGdO4YLK4ShxDJ9F2BuSxewqRLp0htPtFiQaPrmqU.jpg?size=200x200&quality=95&crop=490,773,712,712&ava=1']
-    },
-
-  ]
 
   dispatch(set({ key: 'isDesktop', value: viewWidth >= 3 }))
   dispatch(set({ key: 'platform', value: mainStorage.isDesktop ? VKCOM : usePlatform() }))
@@ -99,15 +71,16 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   }
 
   async function checkAdmin() {
+    router.toPopout(<ScreenSpinner/>)
     let res = await api('profile', 'GET')
-    console.log(res)
     if (res.user.admin) {
       setAdmin(true)
     }
+    getMarket()
+    router.toPopout()
   }
 
   async function checkCart() {
-    console.log(cart)
       if (localStorage.getItem('cart') === null || JSON.parse(localStorage.getItem('cart')).length === 0) {
         localStorage.setItem('cart', "[]")
         setCount(0)
@@ -117,15 +90,29 @@ const App = withAdaptivity(({ viewWidth, router }) => {
             JSON.parse(localStorage.getItem('cart')).length
         )
       }
-
+    getOrders()
   }
 
-  async function getMarket() {
-      let res = await api('items', 'GET')
-    console.log(res)
-    if (res.response) {
-      setMarket(res.items)
+  async function getMarket(offset) {
+    if (!offset) {
+      let res = await api(`items`, 'GET')
+      if (res.response) {
+        setMarket(res.items)
+      }
     }
+    else {
+      let res = await api(`items?offset=${offset}&limit=20`, 'GET')
+      if (res.response) {
+        let items = market
+        items.reverse()
+        // eslint-disable-next-line
+        res.items.map((el) => {
+          items.unshift(el)
+        })
+        setMarket(items.reverse())
+      }
+    }
+    checkCart()
   }
 
   function openSnackbar(text, icon, action) {
@@ -133,6 +120,8 @@ const App = withAdaptivity(({ viewWidth, router }) => {
         <Snackbar
             onClose={() => router.toPopout()}
             before={icon}
+            className={mainStorage.isDesktop && 'snackbar'}
+            duration={1500}
         >
           {text}
         </Snackbar>
@@ -146,28 +135,53 @@ const App = withAdaptivity(({ viewWidth, router }) => {
             before={<Icon28CheckCircleOutline className='snack_suc'/>}
             action='В корзину'
             onActionClick={() => {router.toView('cart'); router.toPopout()}}
+            className={mainStorage.isDesktop && 'snackbar'}
+            duration={1500}
         >
           Товар добавлен в корзину!
         </Snackbar>
     )
   }
 
+  async function getOrders() {
+    try {
+      let res = await api('orders', 'GET')
+      if (res.response) {
+        dispatch(set({key: 'orders', value: res.orders}))
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
+  async function getOrdersAdmin() {
+    try {
+      let res = await api('admin/orders', 'GET')
+      if (res.response) {
+        setOrdersAdmin(res.orders)
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
   useEffect(() => {
     getAppScheme();
-    checkCart();
     checkAdmin();
-    getMarket()
   }, [])
 
   const modals = (
     <ModalRoot activeModal={router.modal} onClose={() => router.toBack()}>
-      <HomeBotsListModal nav="botsList"/>
-      <HomeBotInfoModal nav="botInfo"/>
+      <OrderInfoAdmin nav="orderInfoAdmin" storage={mainStorage} dispatch={(value) => dispatch(value)}/>
+      <OrderInfo nav="orderInfo" storage={mainStorage} dispatch={(value) => dispatch(value)}/>
+      <EditStatus nav='editStatus' storage={mainStorage} getOrders={() => getOrders()} getOrdersAdmin={() => getOrdersAdmin()}/>
     </ModalRoot>
   );
 
   return(
-    <ConfigProvider platform={mainStorage.platform === 'vkcom' ? 'vkcom' : 'ios'} scheme={scheme} isWebView>
+    <ConfigProvider platform={mainStorage.platform } scheme={scheme} isWebView>
       <AppRoot>
         <SplitLayout
           header={mainStorage.hasHeader && <PanelHeader separator={false} />}
@@ -177,8 +191,8 @@ const App = withAdaptivity(({ viewWidth, router }) => {
           <SplitCol
             animate={!mainStorage.isDesktop}
             spaced={mainStorage.isDesktop}
-            width={mainStorage.isDesktop ? '560px' : '100%'}
-            maxWidth={mainStorage.isDesktop ? '560px' : '100%'}
+            width={mainStorage.isDesktop ? '500px' : '100%'}
+            maxWidth={mainStorage.isDesktop ? '500px' : '100%'}
           >   
             <Epic 
               activeStory={router.activeView} 
@@ -197,6 +211,8 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                         products={market}
                         declOfNum={(number, words) => declOfNum(number, words)}
                         admin={admin}
+                        getMarket={(offset) => getMarket(offset)}
+                        setMarket={(value) => setMarket(value)}
                     />
                 </Panel>
 
@@ -209,13 +225,47 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       count={count}
                       setCount={(value) => setCount(value)}
                       openSnackbarCart={() => openSnackbarCart()}
+                      admin={admin}
+                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
+                      getMarket={(offset) => getMarket(offset)}
                   />
                 </Panel>
 
                 <Panel id='addItem'>
                   <AddItem
-                      getMarket={() => getMarket()}
+                      getMarket={(offset) => getMarket(offset)}
                       openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                  />
+                </Panel>
+
+                <Panel id='editItem'>
+                  <EditItem
+                      getMarket={(offset) => getMarket(offset)}
+                      openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                      storage={mainStorage}
+                  />
+                </Panel>
+
+                <Panel id='viewOrders'>
+                  <ViewOrders
+                      dispatch={(value) => dispatch(value)}
+                      getOrders={() => getOrdersAdmin()}
+                      orders={ordersAdmin}
+                  />
+                </Panel>
+
+                <Panel id='infoProductOrderAdmin'>
+                  <InfoProductOrderAdmin
+                      storage={mainStorage}
+                      declOfNum={(number, words) => declOfNum(number, words)}
+                      localstorage={localstorage}
+                      dispatch={(value) => dispatch(value)}
+                      count={count}
+                      setCount={(value) => setCount(value)}
+                      openSnackbarCart={() => openSnackbarCart()}
+                      admin={admin}
+                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
+                      getMarket={(offset) => getMarket(offset)}
                   />
                 </Panel>
 
@@ -233,12 +283,12 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                 <Panel id='base'>
                     <Cart
                         localstorage={localstorage}
-                        cart={cart}
                         isDesktop={mainStorage.isDesktop}
                         storage={mainStorage}
                         dispatch={(value) => dispatch(value)}
                         checkCart={() => checkCart()}
                         setCount={(value) => setCount(value)}
+                        count={count}
                     />
                 </Panel>
 
@@ -248,7 +298,12 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       declOfNum={(number, words) => declOfNum(number, words)}
                       localstorage={localstorage}
                       dispatch={(value) => dispatch(value)}
+                      count={count}
+                      setCount={(value) => setCount(value)}
                       openSnackbarCart={() => openSnackbarCart()}
+                      admin={admin}
+                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
+                      getMarket={(offset) => getMarket(offset)}
                   />
                 </Panel>
 
@@ -256,6 +311,9 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                   <NewOrder
                       router={router}
                       storage={mainStorage}
+                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
+                      setCount={(value) => setCount(value)}
+                      getOrders={() => getOrders()}
                   />
                 </Panel>
 
@@ -270,6 +328,23 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                 <Panel id='base'>
                   <Orders
                       isDesktop={mainStorage.isDesktop}
+                      storage={mainStorage}
+                      dispatch={(value) => dispatch(value)}
+                  />
+                </Panel>
+
+                <Panel id='infoProductOrder'>
+                  <InfoProductOrder
+                      storage={mainStorage}
+                      declOfNum={(number, words) => declOfNum(number, words)}
+                      localstorage={localstorage}
+                      dispatch={(value) => dispatch(value)}
+                      count={count}
+                      setCount={(value) => setCount(value)}
+                      openSnackbarCart={() => openSnackbarCart()}
+                      admin={admin}
+                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
+                      getMarket={(offset) => getMarket(offset)}
                   />
                 </Panel>
               </View>

@@ -15,7 +15,7 @@ import {Icon28ShoppingCartOutline} from "@vkontakte/icons";
 import {set} from "../../reducers/mainReducer";
 import declOfNum from "../../components/declOfNum";
 
-function Cart({router, isDesktop, storage, dispatch, checkCart, setCount}) {
+function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}) {
 
     const [price, setPrice] = useState(0)
     const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')))
@@ -28,10 +28,8 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount}) {
     function calc() {
         if (JSON.parse(localStorage.getItem('cart')).length !== 0) {
             const count = JSON.parse(localStorage.getItem('cart')).length - 1
-            console.log(count)
             let res = 0
             for (let i=0;i<=count;i++) {
-                console.log(JSON.parse(localStorage.getItem('cart'))[i])
                 res = res + Number(JSON.parse(localStorage.getItem('cart'))[i].price)
             }
             setPrice(res)
@@ -44,9 +42,9 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount}) {
 
     return(
         <>
-            <PanelHeader>Корзина</PanelHeader>
+            <PanelHeader separator={storage.isDesktop}>Корзина</PanelHeader>
             <Group>
-                {cart.length === 0 ?
+                {cart.length === 0 || count === 0 ?
                     <Placeholder
                         header="Кажется, здесь ещё ничего нет!"
                         icon={<Icon28ShoppingCartOutline width={56} height={56}/>}
@@ -71,7 +69,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount}) {
                         <>
                         <SimpleCell
                             before={
-                                <Avatar size={75} mode='image' src={el.photo}/>
+                                <Avatar size={75} mode='image' src={el.url}/>
                             }
                             after={<span className='count_cart'>{el.price}₽</span>}
                             style={{marginBottom: 5}}

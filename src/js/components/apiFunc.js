@@ -9,7 +9,7 @@ export default async function api(endpoint, method, params, isUpload) {
 
     if (!isUpload) headers["Content-Type"] = "application/json";
 
-    const data = await fetch(`https://shop-api.nbalin.dev/v1/${endpoint}`, {
+    const data = await fetch(`https://shop-api-dvk5TFNd39SyKtFL.nbalin.dev/v1/${endpoint}`, {
         method: method,
         headers: headers,
         body: !isUpload ? JSON.stringify(params) : params,

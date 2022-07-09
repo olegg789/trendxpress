@@ -10,24 +10,27 @@ import {
     Headline,
     Separator,
     FixedLayout,
-    Button, ButtonGroup, Alert,
+    Button,
+    ButtonGroup,
+    Alert,
 } from "@vkontakte/vkui";
-import {Icon28CheckCircleOutline, Icon28DeleteOutline, Icon28EditOutline} from "@vkontakte/icons";
-import api from "../../components/apiFunc";
+import {
+    Icon28CheckCircleOutline,
+    Icon28DeleteOutline,
+    Icon28EditOutline
+} from "@vkontakte/icons";
+import api from "../../../components/apiFunc";
 import bridge from "@vkontakte/vk-bridge";
 
 function InfoProduct({
-     router,
-     storage,
-     declOfNum,
-     dispatch,
-     count,
-     setCount,
-     openSnackbarCart,
-     admin,
-     openSnackbar,
+    router,
+    storage,
+    count,
+    setCount,
+    openSnackbarCart,
+    admin,
+    openSnackbar,
     getMarket,
-    setCart
 }) {
 
     function addToCart(data) {
@@ -73,7 +76,7 @@ function InfoProduct({
 
     async function delItem() {
         try {
-            let res = await api(`admin/items/${storage.infoProduct.id}`, 'DELETE')
+            let res = await api(`admin/items/${storage.infoProductOrderAdmin.id}`, 'DELETE')
             if (res.response) {
                 router.toBack()
                 router.toBack()
@@ -90,7 +93,7 @@ function InfoProduct({
         <>
             <PanelHeader
                 separator={storage.isDesktop}
-                left={<PanelHeaderBack onClick={() => {router.toBack(); getMarket()}}/>}
+                left={<PanelHeaderBack onClick={() => router.toBack()}/>}
             >
                 Товар
             </PanelHeader>
@@ -101,67 +104,67 @@ function InfoProduct({
                         style={{cursor: 'default'}}
                     >
                         <img
-                            src={storage.infoProduct.url}
+                            src={storage.infoProductOrderAdmin.url}
                             alt=''
                             style={{cursor: 'default'}}
-                            onClick={() => bridge.send("VKWebAppShowImages", {images: [storage.infoProduct.url]})}
+                            onClick={() => bridge.send("VKWebAppShowImages", {images: [storage.infoProductOrderAdmin.url]})}
                         />
                     </Gallery>
 
                     <Div>
                         <Headline weight='regular' style={{fontSize: 20, lineHeight: 1.2}}>
-                            {storage.infoProduct.name}
+                            {storage.infoProductOrderAdmin.name}
                         </Headline>
                         <Headline weight='medium' style={{fontSize: 20, marginTop: 10}}>
-                            {storage.infoProduct.price}₽
+                            {storage.infoProductOrderAdmin.price}₽
                         </Headline>
                     </Div>
 
                     <Separator/>
 
                     <Div style={{whiteSpace: 'pre-line'}}>
-                        {storage.infoProduct.description}
+                        {storage.infoProductOrderAdmin.description}
                     </Div>
                 </div>
 
                 <FixedLayout vertical='bottom' filled>
                     <Div>
                         {admin &&
-                            <ButtonGroup
-                                mode='horizontal'
-                                gap='m'
+                        <ButtonGroup
+                            mode='horizontal'
+                            gap='m'
+                            stretched
+                            style={{marginBottom: 10}}
+                        >
+                            <Button
+                                size='l'
+                                sizeY='compact'
                                 stretched
-                                style={{marginBottom: 10}}
+                                appearance='negative'
+                                before={<Icon28DeleteOutline/>}
+                                mode='secondary'
+                                className='del'
+                                onClick={() => openAlert()}
                             >
-                                <Button
-                                    size='l'
-                                    sizeY='compact'
-                                    stretched
-                                    appearance='negative'
-                                    before={<Icon28DeleteOutline/>}
-                                    mode='secondary'
-                                    className='del'
-                                    onClick={() => openAlert()}
-                                >
-                                    Удалить
-                                </Button>
-                                <Button
-                                    size='l'
-                                    sizeY='compact'
-                                    stretched
-                                    appearance='accent'
-                                    mode='secondary'
-                                    before={<Icon28EditOutline/>}
-                                    className='edit'
-                                    onClick={() => router.toPanel('editItem')}
-                                >
-                                    Изменить
-                                </Button>
-                            </ButtonGroup>}
+                                Удалить
+                            </Button>
+                            <Button
+                                size='l'
+                                sizeY='compact'
+                                stretched
+                                appearance='accent'
+                                mode='secondary'
+                                before={<Icon28EditOutline/>}
+                                className='edit'
+                                onClick={() => router.toPanel('editItem')}
+                            >
+                                Изменить
+                            </Button>
+                        </ButtonGroup>}
                         <Button
                             size='l'
                             stretched
-                            onClick={() => addToCart(storage.infoProduct)}
+                            onClick={() => addToCart(storage.infoProductOrderAdmin)}
                         >
                             Добавить в корзину
                         </Button>

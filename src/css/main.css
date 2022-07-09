@@ -7,6 +7,10 @@ body[scheme=vkcom_dark] .vkuiGradient--md-tint.vkuiGradient--to-top {
     margin: 0 auto;
 }
 
+:root {
+    user-select: none;
+}
+
 .activeViewCell {
     background-color: var(--button_secondary_background);
     border-radius: 8px;
@@ -47,14 +51,30 @@ body[scheme=vkcom_dark] .vkuiGradient--md-tint.vkuiGradient--to-top {
 
 .products {
     display: flex;
-    flex-wrap: wrap;
     justify-items: center;
-    justify-content: center;
+    flex-wrap: wrap;
+    justify-content: space-around;
 }
 
+.product {
+    width: 40%;
+    margin-left: -5px;
+    margin-right: 0;
+    cursor: pointer;
+    justify-items: center;
+}
 
+.product_web {
+    width: 30%;
+    margin-left: -20px;
+    margin-right: -20px;
+    cursor: pointer;
+    justify-items: center;
+}
 
-
+.products .product {
+    justify-content: space-around;
+}
 
 .test {
     font-size: 13px;
@@ -77,4 +97,34 @@ body[scheme=vkcom_dark] .vkuiGradient--md-tint.vkuiGradient--to-top {
 
 .snack_suc {
     color: var(--dynamic_green)
+}
+
+.snack_err {
+    color: var(--dynamic_red)
+}
+
+.del {
+    background-color: rgba(230, 70, 70, 0.1);
+}
+
+.edit {
+    background-color: rgba(45, 129, 225, 0.1);
+}
+
+.textAdmin {
+    color: var(--text_secondary)
+}
+
+.snackbar {
+    margin-bottom: -50px;
+}
+
+.search {
+    margin: 5px
+}
+
+.vkuiTabbarItem--android .vkuiTabbarItem__tappable {
+    width: calc(100% + 16px);
+    padding-bottom: 0px;
+    border-radius: 50%;
 }

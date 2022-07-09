@@ -13,20 +13,19 @@ import {
 } from "@vkontakte/vkui";
 import {
     Icon24PictureOutline,
-    Icon28AddCircleOutline,
     Icon28CancelCircleOutline,
-    Icon28CheckCircleOutline
+    Icon28CheckCircleOutline,
+    Icon28EditOutline
 } from "@vkontakte/icons";
 import api from "../../../components/apiFunc";
-import {useSelector} from "react-redux";
 
-function AddItem({router, getMarket, openSnackbar}) {
-    const storage = useSelector((state) => state.main)
+function EditItem({router, getMarket, openSnackbar, storage}) {
 
-    const [name, setName] = useState('')
-    const [description, setDescription] = useState('')
-    const [price, setPrice] = useState('')
+    const [name, setName] = useState(storage.infoProduct.name)
+    const [description, setDescription] = useState(storage.infoProduct.description)
+    const [price, setPrice] = useState(storage.infoProduct.price)
     const [photo, setPhoto] = useState('')
+    const [photoUrl, setPhotoUrl] = useState(storage.infoProduct.url)
 
     async function uploadPhoto(file) {
         try {
@@ -49,23 +48,29 @@ function AddItem({router, getMarket, openSnackbar}) {
         }
     }
 
-    async function addItem() {
+    async function editItem() {
         try {
             let res = await api(
-                "admin/items",
-                'POST',
-                {
-                    'name': name,
-                    'description': description,
-                    'price': price,
-                    'photo_id': photo
-                }
+                `admin/items/${storage.infoProduct.id}`,
+                'PATCH',
+                storage.infoProduct.url !== photoUrl ?
+                    {
+                        'name': name,
+                        'description': description,
+                        'price': price,
+                        'photo_id': photo
+                    } :
+                    {
+                        'name': name,
+                        'description': description,
+                        'price': price,
+                    }
             )
             if (res.response) {
                 console.log('УРА')
                 router.toBack()
                 getMarket()
-                openSnackbar('Товар добавлен!', <Icon28CheckCircleOutline className='snack_suc'/>)
+                openSnackbar('Товар обновлен!', <Icon28CheckCircleOutline className='snack_suc'/>)
             }
             else {
                 if (res.error.code === 4) {
@@ -80,14 +85,14 @@ function AddItem({router, getMarket, openSnackbar}) {
 
     return (
         <>
-        <PanelHeader
-            separator={storage.isDesktop}
-            left={
-                <PanelHeaderBack onClick={() => router.toBack()}/>
+            <PanelHeader
+                left={
+                    <PanelHeaderBack onClick={() => router.toBack()}/>
                 }
+                separator={storage.isDesktop}
             >
-            Добавить товар
-        </PanelHeader>
+                Добавить товар
+            </PanelHeader>
             <Group>
                 <FormLayout id='createItem'>
                     <FormItem top='Название'>
@@ -143,6 +148,7 @@ function AddItem({router, getMarket, openSnackbar}) {
                             onChange={(e) => {
                                 e.preventDefault();
                                 uploadPhoto(e.target.files[0]);
+                                setPhotoUrl(e.target.files[0])
                             }}
                         >
                             {photo === "" ? "Выберите фото" : "Фото выбрано"}
@@ -156,13 +162,13 @@ function AddItem({router, getMarket, openSnackbar}) {
                         <Button
                             size='l'
                             stretched
-                            onClick={() => addItem()}
-                            before={<Icon28AddCircleOutline/>}
+                            onClick={() => editItem()}
+                            before={<Icon28EditOutline/>}
                             disabled={
-                                name.length === 0 || price.length === 0 || photo.length === 0
+                                name.length === 0 || price.length === 0
                             }
                         >
-                            Создать
+                            Обновить
                         </Button>
                     </Div>
                 </FixedLayout>
@@ -172,4 +178,4 @@ function AddItem({router, getMarket, openSnackbar}) {
     )
 }
 
-export default withRouter(AddItem)
+export default withRouter(EditItem)

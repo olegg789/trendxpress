@@ -11,7 +11,7 @@ import {
     Separator,
     FixedLayout,
     Button,
-} from "@vkontakte/vkui"
+} from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 
 function InfoProduct({
@@ -20,9 +20,8 @@ function InfoProduct({
     count,
     setCount,
     openSnackbarCart,
-    admin,
     openSnackbar,
-getMarket,
+    getMarket,
 }) {
 
     function addToCart(data) {
@@ -58,26 +57,26 @@ getMarket,
                         style={{cursor: 'default'}}
                     >
                         <img
-                            src={storage.infoProductCart.url}
+                            src={storage.infoProductOrder.url}
                             alt=''
                             style={{cursor: 'default'}}
-                            onClick={() => bridge.send("VKWebAppShowImages", {images: [storage.infoProductCart.url]})}
+                            onClick={() => bridge.send("VKWebAppShowImages", {images: [storage.infoProductOrder.url]})}
                         />
                     </Gallery>
 
                     <Div>
                         <Headline weight='regular' style={{fontSize: 20, lineHeight: 1.2}}>
-                            {storage.infoProductCart.name}
+                            {storage.infoProductOrder.name}
                         </Headline>
                         <Headline weight='medium' style={{fontSize: 20, marginTop: 10}}>
-                            {storage.infoProductCart.price}₽
+                            {storage.infoProductOrder.price}₽
                         </Headline>
                     </Div>
 
                     <Separator/>
 
                     <Div style={{whiteSpace: 'pre-line'}}>
-                        {storage.infoProductCart.description}
+                        {storage.infoProductOrder.description}
                     </Div>
                 </div>
 
@@ -86,7 +85,7 @@ getMarket,
                         <Button
                             size='l'
                             stretched
-                            onClick={() => addToCart(storage.infoProductCart)}
+                            onClick={() => addToCart(storage.infoProductOrder)}
                         >
                             Добавить в корзину
                         </Button>
