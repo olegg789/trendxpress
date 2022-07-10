@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
-    Button, Div,
+    Button, CustomSelect, CustomSelectOption, Div,
     File, FixedLayout,
     FormItem,
     FormLayout,
@@ -20,13 +20,14 @@ import {
 import api from "../../../components/apiFunc";
 import {useSelector} from "react-redux";
 
-function AddItem({router, getMarket, openSnackbar}) {
+function AddItem({router, getMarket, openSnackbar, albums}) {
     const storage = useSelector((state) => state.main)
 
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [price, setPrice] = useState('')
     const [photo, setPhoto] = useState('')
+    const [album, setAlbum] = useState(null)
 
     async function uploadPhoto(file) {
         try {
@@ -54,12 +55,20 @@ function AddItem({router, getMarket, openSnackbar}) {
             let res = await api(
                 "admin/items",
                 'POST',
-                {
-                    'name': name,
-                    'description': description,
-                    'price': price,
-                    'photo_id': photo
-                }
+                album !== null ?
+                    {
+                        'name': name,
+                        'description': description,
+                        'price': price,
+                        'photo_id': photo,
+                        'album_ids': Number(album)
+                    } :
+                    {
+                        'name': name,
+                        'description': description,
+                        'price': price,
+                        'photo_id': photo
+                    }
             )
             if (res.response) {
                 router.toBack()
@@ -108,6 +117,22 @@ function AddItem({router, getMarket, openSnackbar}) {
                                 setDescription(e.currentTarget.value)
                             }}
                             placeholder='Размеры: 50, 52, 54'
+                        />
+                    </FormItem>
+
+                    <FormItem top='Выберите подборку (необязательно)'>
+                        <CustomSelect
+                            options={
+                                albums.map((el) => {
+                                    return {value: el.id, label: el.name}
+                                })
+                            }
+                            renderOption={({option, ...rest}) => (
+                                <CustomSelectOption {...rest}/>
+                                )}
+                            placeholder='Не выбран'
+                            value={album}
+                            onChange={(e) => {setAlbum(e.currentTarget.value); console.log(e.currentTarget.value)}}
                         />
                     </FormItem>
 

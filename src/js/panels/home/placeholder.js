@@ -124,7 +124,7 @@ function InfoProduct({
                     </Div>
                 </div>
 
-                <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayout': ''}>
+                <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayoutCart': ''}>
                     <Div>
                         {admin &&
                             <ButtonGroup

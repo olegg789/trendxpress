@@ -189,8 +189,8 @@ body[scheme=bright_light] {
     margin-left: -8px;
 }
 
-.basePanel {
-    overflow-y: hidden;
+::-webkit-scrollbar {
+    width: 0;
 }
 
 .iconNavigation {

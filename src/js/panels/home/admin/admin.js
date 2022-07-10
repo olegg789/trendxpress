@@ -27,6 +27,16 @@ function Admin({router}) {
                     </Button>
                 </FormItem>
 
+                <FormItem top='Управление подборками'>
+                    <Button
+                        size='l'
+                        stretched
+                        onClick={() => router.toPanel('editAlbums')}
+                    >
+                        Открыть
+                    </Button>
+                </FormItem>
+
                 <FormItem top='Управление заказами'>
                     <Button
                         size='l'
@@ -36,6 +46,7 @@ function Admin({router}) {
                         Открыть
                     </Button>
                 </FormItem>
+
             </Group>
         </>
     )

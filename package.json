@@ -8,7 +8,7 @@
     "start": "cross-env HTTPS=true react-scripts start",
     "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "kokateam-deploy",
+    "deploy": "gh-pages -d build",
     "tunnel": "vk-tunnel --insecure=1 --http-protocol=https --ws-protocol=wss --host=localhost --port=3000"
   },
   "keywords": [],

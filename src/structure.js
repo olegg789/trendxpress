@@ -9,6 +9,11 @@ const structure = [
 			},
 
 			{
+				id: 'album',
+				hash: ''
+			},
+
+			{
 				id: "infoProduct",
 				hash: '/placeholder'
 			},
@@ -31,7 +36,23 @@ const structure = [
 			{
 				id: 'viewOrders',
 				hash: ''
+			},
+
+			{
+				id: 'addAlbum',
+				hash: ''
+			},
+
+			{
+				id: 'editAlbums',
+				hash: ''
+			},
+
+			{
+				id: 'editAlbum',
+				hash: ''
 			}
+
 		]
 	},
 

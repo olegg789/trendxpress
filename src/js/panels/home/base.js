@@ -1,4 +1,4 @@
-import React, {useCallback, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
     CardGrid,
@@ -8,19 +8,21 @@ import {
     Placeholder,
     Search,
     Spinner,
-    ContentCard
+    ContentCard, Header, Footer, Link, Separator, Button
 } from "@vkontakte/vkui";
 import {Icon28UserStarBadgeOutline} from "@vkontakte/icons";
 import {useDispatch} from "react-redux";
 import {set} from "../../reducers/mainReducer";
 import {InfScroll} from "@vkma/infscroll";
 import api from "../../components/apiFunc";
+import declOfNum from "../../components/declOfNum";
 
-function Market({router, products, setMarket, admin, getMarket, storage, loading, setLoading}) {
+function Market({router, products, setMarket, admin, getMarket, storage, loading, setLoading, albums}) {
     const dispatch = useDispatch()
 
     const [need, setNeed] = useState(true)
     const [result, setResult] = useState(true)
+    const [but, setBut] = useState(true)
 
     function openInfo(data) {
         dispatch(set({key: 'infoProduct', value: data}))
@@ -73,9 +75,64 @@ function Market({router, products, setMarket, admin, getMarket, storage, loading
         >
             Товары
         </PanelHeader>
-        <Group>
             {products.length > 0 || !loading ?
             <>
+                {albums.length > 0 &&
+                <Group separator={false} header={<Header>Подборки <span className='count_cart'>{albums.length}</span></Header> }>
+                <CardGrid size='l' className='products'>
+                    {but ?
+                        <>
+                        <ContentCard
+                            src={albums[0].url}
+                            text={albums[0].name}
+                            caption={albums[0].count + ' ' + declOfNum(albums[0].count, ["товар", "товара", "товаров"])}
+                            maxHeight={storage.isDesktop ? 150 : 75}
+                            onClick={() => {
+                                dispatch(set({key: 'albumId', value: albums[0].id}))
+                                router.toPanel('album')
+                            }
+                            }
+                        />
+                        <ContentCard
+                            src={albums[1].url}
+                            text={albums[1].name}
+                            caption={albums[1].count + ' ' + declOfNum(albums[1].count, ["товар", "товара", "товаров"])}
+                            maxHeight={storage.isDesktop ? 150 : 75}
+                            onClick={() => {
+                                dispatch(set({key: 'albumId', value: albums[1].id}))
+                                router.toPanel('album')
+                            }
+                            }
+                        />
+                        </>
+                     :
+                        albums.map((el) => {
+                            return (
+                                <ContentCard
+                                    src={el.url}
+                                    text={el.name}
+                                    caption={el.count + ' ' + declOfNum(el.count, ["товар", "товара", "товаров"])}
+                                    maxHeight={storage.isDesktop ? 150 : 75}
+                                    onClick={() => {
+                                        dispatch(set({key: 'albumId', value: el.id}))
+                                        router.toPanel('album')
+                                    }
+                                    }
+                                />
+                            )
+                        })}
+                </CardGrid>
+                <Button
+                    mode='tertiary'
+                    stretched
+                    size='s'
+                    style={{padding: 7}}
+                    onClick={() => setBut(!but)}
+                >
+                    {but ? 'Показать все' : 'Свернуть'}
+                </Button>
+            </Group>}
+            <Group header={<Header>Все товары</Header>} separator={false}>
             <Search
                 value={storage.search}
                 onChange={(e) => {
@@ -109,11 +166,11 @@ function Market({router, products, setMarket, admin, getMarket, storage, loading
                         Ничего не найдено
                     </Placeholder>
                 }
+                </Group>
 
             </> :
                 <Spinner style={{marginTop: 10}}/>
             }
-        </Group>
         </>
     )
 }

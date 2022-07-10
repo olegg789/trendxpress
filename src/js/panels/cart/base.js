@@ -109,7 +109,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                         </div>
 
 
-                        <FixedLayout vertical='bottom' filled className={storage.isDesktop ? count >= 4 ? 'fixedLayout' : 'fixedLayoutCart' : ''}>
+                        <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayoutCart' : ''}>
                             <Separator wide/>
                             <Header mode='secondary'>Итого</Header>
                             <SimpleCell

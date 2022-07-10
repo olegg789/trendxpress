@@ -1,8 +1,10 @@
 import React, {useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
-    Button, CustomSelect, CustomSelectOption, Div,
-    File, FixedLayout,
+    Button,
+    Div,
+    File,
+    FixedLayout,
     FormItem,
     FormLayout,
     Group,
@@ -11,22 +13,20 @@ import {
     PanelHeaderBack,
     Textarea
 } from "@vkontakte/vkui";
+import api from "../../../components/apiFunc";
 import {
     Icon24PictureOutline,
     Icon28CancelCircleOutline,
     Icon28CheckCircleOutline,
     Icon28EditOutline
 } from "@vkontakte/icons";
-import api from "../../../components/apiFunc";
 
-function EditItem({router, getMarket, openSnackbar, storage, albums}) {
+function EditAlbum({router, getAlbums, storage, openSnackbar}) {
 
-    const [name, setName] = useState(storage.infoProduct.name)
-    const [description, setDescription] = useState(storage.infoProduct.description)
-    const [price, setPrice] = useState(storage.infoProduct.price)
+    const [name, setName] = useState(storage.albumInfoAdmin.name)
     const [photo, setPhoto] = useState('')
-    const [photoUrl, setPhotoUrl] = useState(storage.infoProduct.url)
-    const [album, setAlbum] = useState(Number(storage.infoProduct.album_ids))
+    const [photoUrl, setPhotoUrl] = useState(storage.albumInfoAdmin.url)
+    const [albumId, setAlbumId] = useState(storage.albumInfoAdmin.album_id !== null ? storage.albumInfoAdmin.album_id : '')
 
     async function uploadPhoto(file) {
         try {
@@ -52,32 +52,28 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
     async function editItem() {
         try {
             let res = await api(
-                `admin/items/${storage.infoProduct.id}`,
+                `admin/albums/${storage.albumInfoAdmin.id}`,
                 'PATCH',
-                storage.infoProduct.url !== photoUrl ?
+                storage.albumInfoAdmin.url !== photoUrl ?
                     {
                         'name': name,
-                        'description': description,
-                        'price': price,
                         'photo_id': photo,
-                        'album_ids': album
+                        'album_ids': Number(albumId)
                     } :
                     {
                         'name': name,
-                        'description': description,
-                        'price': price,
-                        'album_ids': album
+                        'album_id': Number(albumId)
                     }
             )
             if (res.response) {
                 console.log('УРА')
                 router.toBack()
-                getMarket()
-                openSnackbar('Товар обновлен!', <Icon28CheckCircleOutline className='snack_suc'/>)
+                getAlbums()
+                openSnackbar('Подборка обновлена!', <Icon28CheckCircleOutline className='snack_suc'/>)
             }
             else {
                 if (res.error.code === 4) {
-                    openSnackbar('Товар с таким названием уже существует!', <Icon28CancelCircleOutline className='snack_err'/>)
+                    openSnackbar('Подборка с таким названием уже существует!', <Icon28CancelCircleOutline className='snack_err'/>)
                 }
             }
         }
@@ -94,7 +90,7 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
                 }
                 separator={storage.isDesktop}
             >
-                Отредактировать товар
+                Отредактировать подборку
             </PanelHeader>
             <Group>
                 <FormLayout id='createItem'>
@@ -104,48 +100,16 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
                             onChange={(e) => {
                                 if (e.currentTarget.value.length > 50) return
                                 setName(e.currentTarget.value)
-                            }}
-                            placeholder='Куртка детская'
+                            }}placeholder='Куртка детская'
                             maxLength={50}
                         />
                     </FormItem>
 
-                    <FormItem top='Описание'>
-                        <Textarea
-                            value={description}
-                            onChange={(e) => {
-                                setDescription(e.currentTarget.value)
-                            }}
-                            placeholder='Размеры: 50, 52, 54'
-                        />
-                    </FormItem>
-
-                    <FormItem top='Подборка (необязательно)'>
-                        <CustomSelect
-                            options={
-                                albums.map((el) => {
-                                    return {value: el.id, label: el.name}
-                                })
-                            }
-                            renderOption={({option, ...rest}) => (
-                                <CustomSelectOption {...rest}/>
-                            )}
-                            placeholder='Не выбран'
-                            value={album}
-                            onChange={(e) => {setAlbum(e.currentTarget.value); console.log(e.currentTarget.value)}}
-                        />
-                    </FormItem>
-
-                    <FormItem top='Цена'>
+                    <FormItem top='Id подборки (необязательно)'>
                         <Input
-                            value={price}
-                            onChange={(e) => {
-                                if (e.currentTarget.value.length > 10) return
-                                setPrice(e.currentTarget.value)
-                            }}
-                            maxLength={10}
                             type='number'
-                            placeholder='100'
+                            value={albumId}
+                            onChange={(e) => setAlbumId(e.currentTarget.value)}
                         />
                     </FormItem>
 
@@ -184,7 +148,7 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
                             onClick={() => editItem()}
                             before={<Icon28EditOutline/>}
                             disabled={
-                                name.length === 0 || price.length === 0
+                                name.length === 0
                             }
                         >
                             Обновить
@@ -197,4 +161,4 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
     )
 }
 
-export default withRouter(EditItem)
+export default withRouter(EditAlbum)

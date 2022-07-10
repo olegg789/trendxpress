@@ -1,39 +1,37 @@
 import React, {useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
-    Button, CustomSelect, CustomSelectOption, Div,
-    File, FixedLayout,
+    Button,
+    Div, File, FixedLayout,
     FormItem,
     FormLayout,
     Group,
     Input,
     PanelHeader,
     PanelHeaderBack,
-    Textarea
 } from "@vkontakte/vkui";
 import {
     Icon24PictureOutline,
+    Icon28AddCircleOutline,
     Icon28CancelCircleOutline,
-    Icon28CheckCircleOutline,
-    Icon28EditOutline
+    Icon28CheckCircleOutline
 } from "@vkontakte/icons";
+import {useSelector} from "react-redux";
 import api from "../../../components/apiFunc";
 
-function EditItem({router, getMarket, openSnackbar, storage, albums}) {
+function AddAlbum({router, getAlbums, openSnackbar}) {
+    const storage = useSelector((state) => state.main)
 
-    const [name, setName] = useState(storage.infoProduct.name)
-    const [description, setDescription] = useState(storage.infoProduct.description)
-    const [price, setPrice] = useState(storage.infoProduct.price)
+    const [name, setName] = useState('')
     const [photo, setPhoto] = useState('')
-    const [photoUrl, setPhotoUrl] = useState(storage.infoProduct.url)
-    const [album, setAlbum] = useState(Number(storage.infoProduct.album_ids))
+    const [albumId, setAlbumId] = useState('')
 
     async function uploadPhoto(file) {
         try {
             let response = await api(
                 "admin/uploads",
                 "POST",
-                new FormData(document.getElementById("createItem")),
+                new FormData(document.getElementById("createAlbum")),
                 true
             );
             console.log(response)
@@ -49,35 +47,30 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
         }
     }
 
-    async function editItem() {
+    async function addAlbum() {
         try {
             let res = await api(
-                `admin/items/${storage.infoProduct.id}`,
-                'PATCH',
-                storage.infoProduct.url !== photoUrl ?
+                "admin/albums",
+                'POST',
+                albumId.length !== 0 ?
                     {
                         'name': name,
-                        'description': description,
-                        'price': price,
                         'photo_id': photo,
-                        'album_ids': album
+                        'album_id': Number(albumId)
                     } :
                     {
                         'name': name,
-                        'description': description,
-                        'price': price,
-                        'album_ids': album
+                        'photo_id': photo
                     }
             )
             if (res.response) {
-                console.log('УРА')
                 router.toBack()
-                getMarket()
-                openSnackbar('Товар обновлен!', <Icon28CheckCircleOutline className='snack_suc'/>)
+                getAlbums()
+                openSnackbar('Подборка добавлена!', <Icon28CheckCircleOutline className='snack_suc'/>)
             }
             else {
                 if (res.error.code === 4) {
-                    openSnackbar('Товар с таким названием уже существует!', <Icon28CancelCircleOutline className='snack_err'/>)
+                    openSnackbar('Подборка с таким названием уже существует!', <Icon28CancelCircleOutline className='snack_err'/>)
                 }
             }
         }
@@ -86,70 +79,37 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
         }
     }
 
-    return (
+    return(
         <>
             <PanelHeader
                 left={
                     <PanelHeaderBack onClick={() => router.toBack()}/>
                 }
-                separator={storage.isDesktop}
             >
-                Отредактировать товар
+                Добавить альбом
             </PanelHeader>
             <Group>
-                <FormLayout id='createItem'>
-                    <FormItem top='Название'>
+                <FormLayout id='createAlbum'>
+                    <FormItem top='Название' style={{marginTop: -10}}>
                         <Input
                             value={name}
                             onChange={(e) => {
                                 if (e.currentTarget.value.length > 50) return
                                 setName(e.currentTarget.value)
                             }}
-                            placeholder='Куртка детская'
                             maxLength={50}
                         />
                     </FormItem>
 
-                    <FormItem top='Описание'>
-                        <Textarea
-                            value={description}
-                            onChange={(e) => {
-                                setDescription(e.currentTarget.value)
-                            }}
-                            placeholder='Размеры: 50, 52, 54'
-                        />
-                    </FormItem>
-
-                    <FormItem top='Подборка (необязательно)'>
-                        <CustomSelect
-                            options={
-                                albums.map((el) => {
-                                    return {value: el.id, label: el.name}
-                                })
-                            }
-                            renderOption={({option, ...rest}) => (
-                                <CustomSelectOption {...rest}/>
-                            )}
-                            placeholder='Не выбран'
-                            value={album}
-                            onChange={(e) => {setAlbum(e.currentTarget.value); console.log(e.currentTarget.value)}}
-                        />
-                    </FormItem>
-
-                    <FormItem top='Цена'>
+                    <FormItem top='Id подборки (необязательно)'>
                         <Input
-                            value={price}
-                            onChange={(e) => {
-                                if (e.currentTarget.value.length > 10) return
-                                setPrice(e.currentTarget.value)
-                            }}
-                            maxLength={10}
                             type='number'
-                            placeholder='100'
+                            value={albumId}
+                            onChange={(e) => setAlbumId(e.currentTarget.value)}
                         />
                     </FormItem>
 
-                    <FormItem top='Фото товара'>
+                    <FormItem top='Фото подборки' style={{marginTop: -10}}>
                         <File
                             name="photo"
                             before={
@@ -167,7 +127,6 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
                             onChange={(e) => {
                                 e.preventDefault();
                                 uploadPhoto(e.target.files[0]);
-                                setPhotoUrl(e.target.files[0])
                             }}
                         >
                             {photo === "" ? "Выберите фото" : "Фото выбрано"}
@@ -181,20 +140,19 @@ function EditItem({router, getMarket, openSnackbar, storage, albums}) {
                         <Button
                             size='l'
                             stretched
-                            onClick={() => editItem()}
-                            before={<Icon28EditOutline/>}
+                            onClick={() => addAlbum()}
+                            before={<Icon28AddCircleOutline/>}
                             disabled={
-                                name.length === 0 || price.length === 0
+                                name.length === 0  || photo.length === 0
                             }
                         >
-                            Обновить
+                            Создать
                         </Button>
                     </Div>
                 </FixedLayout>
-
             </Group>
         </>
     )
 }
 
-export default withRouter(EditItem)
+export default withRouter(AddAlbum)

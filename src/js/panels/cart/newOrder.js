@@ -121,7 +121,7 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                     </FormLayout>
                 </div>
 
-                <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayout' : ''}>
+                <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayoutCart' : ''}>
                     <Separator wide/>
                     <Header mode='secondary'>Итого</Header>
                     <SimpleCell

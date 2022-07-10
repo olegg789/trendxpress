@@ -38,6 +38,10 @@ import OrderInfo from "./js/components/modals/HomeBotInfoModal";
 import ViewOrders from "./js/panels/home/admin/viewOrders";
 import OrderInfoAdmin from "./js/components/modals/HomeBotsListModal";
 import EditStatus from "./js/components/modals/EditStatus";
+import AddAlbum from "./js/panels/home/admin/addAlbum";
+import EditAlbums from "./js/panels/home/admin/editAlbums";
+import EditAlbum from "./js/panels/home/admin/editAlbum";
+import Album from "./js/panels/home/album";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
   const mainStorage = useSelector((state) => state.main)
@@ -51,6 +55,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   const [loading, setLoading] = useState(true)
   const [snackbar, setSnackbar] = useState(null)
   const [loadingMain, setLoadingMain] = useState(true)
+  const [albums, setAlbums] = useState([])
 
   const localstorage = localStorage
 
@@ -114,7 +119,19 @@ const App = withAdaptivity(({ viewWidth, router }) => {
       }
     }
     setLoadingMain(false)
-    checkCart()
+  }
+
+  async function getAlbums() {
+    try {
+      let res = await api('albums', 'GET')
+      if (res.response) {
+        console.log(res)
+        setAlbums(res.albums)
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
   }
 
   function openSnackbar(text, icon) {
@@ -174,6 +191,8 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   useEffect(() => {
     getAppScheme();
     checkAdmin();
+    getAlbums();
+    checkCart()
   }, [])
 
   const modals = (
@@ -216,7 +235,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                 popout={router.popout}
                 modal={modals}
               >
-                <Panel id='base' className='basePanel'>
+                <Panel id='base' className={mainStorage.isDesktop ? 'basePanel' : ''}>
                     <Market
                         router={router}
                         storage={mainStorage}
@@ -227,8 +246,13 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                         setMarket={(value) => setMarket(value)}
                         loading={loadingMain}
                         setLoading={(value) => setLoadingMain(value)}
+                        albums={albums}
                     />
                   {snackbar}
+                </Panel>
+
+                <Panel id='album'>
+                  <Album storage={mainStorage}/>
                 </Panel>
 
                 <Panel id='infoProduct'>
@@ -256,6 +280,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                   <AddItem
                       getMarket={(offset) => getMarket(offset)}
                       openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                      albums={albums}
                   />
                   {snackbar}
                 </Panel>
@@ -265,6 +290,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       getMarket={(offset) => getMarket(offset)}
                       openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
                       storage={mainStorage}
+                      albums={albums}
                   />
                   {snackbar}
                 </Panel>
@@ -275,6 +301,32 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       getOrders={() => getOrdersAdmin()}
                       orders={ordersAdmin}
                       loading={loading}
+                  />
+                  {snackbar}
+                </Panel>
+
+                <Panel id='addAlbum'>
+                  <AddAlbum
+                      getAlbums={() => getAlbums()}
+                      openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                      albums={albums}
+                  />
+                </Panel>
+
+                <Panel id='editAlbums'>
+                  <EditAlbums
+                      albums={albums}
+                      getAlbums={() => getAlbums()}
+                      openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                  />
+                  {snackbar}
+                </Panel>
+
+                <Panel id='editAlbum'>
+                  <EditAlbum
+                      getAlbums={() => getAlbums()}
+                      openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                      storage={mainStorage}
                   />
                   {snackbar}
                 </Panel>
