@@ -11,7 +11,7 @@ import {
 } from "@vkontakte/icons";
 import {set} from "../../reducers/mainReducer";
 
-function OrdersList({router, orders, dispatch}) {
+function OrdersList({router, orders, dispatch, getOrders}) {
 
     const statuses = [
         'На модерации',
@@ -49,7 +49,7 @@ function OrdersList({router, orders, dispatch}) {
                                 after={<IconButton onClick={() => openInfo(el)} icon={<Icon28InfoCircleOutline/>}/> }
                             >
                                 Товаров в заказе: {el.items.length} <br/>
-                                Сумма: {el.amount}₽
+                                Сумма: {el.amount} ₽
                             </SimpleCell>
                         </FormItem>
                     )

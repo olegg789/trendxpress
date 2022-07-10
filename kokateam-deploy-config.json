@@ -1,4 +1,5 @@
 {
   "static_path": "build",
-  "app_id": "8210972"
+  "app_id": "8210972",
+  "useRandomPrefix": true
 }

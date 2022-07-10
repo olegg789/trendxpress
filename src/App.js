@@ -56,7 +56,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
 
   dispatch(set({ key: 'isDesktop', value: viewWidth >= 3 }))
   dispatch(set({ key: 'platform', value: mainStorage.isDesktop ? VKCOM : usePlatform() }))
-  dispatch(set({ key: 'hasHeader', value: mainStorage.isDesktop !== true }))
+  dispatch(set({ key: 'hasHeader', value: mainStorage.isDesktop }))
   dispatch(set({key: 'cart', value: "[]"}))
 
   async function getAppScheme() {
@@ -191,12 +191,14 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   );
 
   return(
-    <ConfigProvider platform={mainStorage.platform } scheme={scheme} isWebView>
+    <ConfigProvider platform={mainStorage.platform === 'vkcom' ? 'android' : 'ios' } scheme={scheme} isWebView>
       <AppRoot>
         <SplitLayout
           header={mainStorage.hasHeader && <PanelHeader separator={false} />}
           style={{ justifyContent: "center" }}
         >
+
+          {mainStorage.isDesktop && <DesktopNavigation/>}
 
           <SplitCol
             animate={!mainStorage.isDesktop}
@@ -214,7 +216,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                 popout={router.popout}
                 modal={modals}
               >
-                <Panel id='base'>
+                <Panel id='base' className='basePanel'>
                     <Market
                         router={router}
                         storage={mainStorage}
@@ -224,6 +226,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                         getMarket={(offset) => getMarket(offset)}
                         setMarket={(value) => setMarket(value)}
                         loading={loadingMain}
+                        setLoading={(value) => setLoadingMain(value)}
                     />
                   {snackbar}
                 </Panel>
@@ -329,9 +332,6 @@ const App = withAdaptivity(({ viewWidth, router }) => {
               </View>
             </Epic>
           </SplitCol>
-
-          {mainStorage.isDesktop && <DesktopNavigation/>}
-
         </SplitLayout>
       </AppRoot>
     </ConfigProvider>

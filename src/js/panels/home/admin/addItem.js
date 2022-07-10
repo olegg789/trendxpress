@@ -150,7 +150,7 @@ function AddItem({router, getMarket, openSnackbar}) {
 
                 </FormLayout>
 
-                <FixedLayout vertical='bottom' filled>
+                <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayoutCart' : ''}>
                     <Div>
                         <Button
                             size='l'

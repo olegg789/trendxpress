@@ -96,14 +96,14 @@ function InfoProduct({
             </PanelHeader>
 
             <Group>
-                <div style={{marginBottom: 120}}>
+                <div style={ storage.isDesktop ? {marginBottom: 60} : {marginBottom: 120}}>
                     <Gallery
                         style={{cursor: 'default'}}
                     >
                         <img
                             src={storage.infoProduct.url}
                             alt=''
-                            style={{cursor: 'default'}}
+                            style={{cursor: 'default', borderRadius: storage.isDesktop ? 10 : 0}}
                             onClick={() => bridge.send("VKWebAppShowImages", {images: [storage.infoProduct.url]})}
                         />
                     </Gallery>
@@ -113,7 +113,7 @@ function InfoProduct({
                             {storage.infoProduct.name}
                         </Headline>
                         <Headline weight='medium' style={{fontSize: 20, marginTop: 10}}>
-                            {storage.infoProduct.price}₽
+                            {storage.infoProduct.price} ₽
                         </Headline>
                     </Div>
 
@@ -124,7 +124,7 @@ function InfoProduct({
                     </Div>
                 </div>
 
-                <FixedLayout vertical='bottom' filled>
+                <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayout': ''}>
                     <Div>
                         {admin &&
                             <ButtonGroup

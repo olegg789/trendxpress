@@ -72,7 +72,7 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
         <>
         <PanelHeader separator={storage.isDesktop} left={<PanelHeaderBack onClick={() => router.toBack()}/> }>Новый заказ</PanelHeader>
             <Group>
-                <div style={{marginBottom: 200}}>
+                <div style={ storage.isDesktop ? {marginBottom: 90} : {marginBottom: 150}}>
                     <FormLayout>
                         <FormItem top='Адрес доставки'>
                             <Textarea
@@ -121,7 +121,7 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                     </FormLayout>
                 </div>
 
-                <FixedLayout vertical='bottom' filled>
+                <FixedLayout vertical='bottom' filled className={storage.isDesktop ? 'fixedLayout' : ''}>
                     <Separator wide/>
                     <Header mode='secondary'>Итого</Header>
                     <SimpleCell
@@ -132,7 +132,7 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                                     </span>
                         }
                     >
-                        {storage.price}₽
+                        {storage.price} ₽
                     </SimpleCell>
                     <Div>
                         <Button

@@ -16,7 +16,7 @@ import {set} from "../../reducers/mainReducer";
 import {InfScroll} from "@vkma/infscroll";
 import api from "../../components/apiFunc";
 
-function Market({router, products, setMarket, admin, getMarket, storage, loading}) {
+function Market({router, products, setMarket, admin, getMarket, storage, loading, setLoading}) {
     const dispatch = useDispatch()
 
     const [need, setNeed] = useState(true)
@@ -96,7 +96,7 @@ function Market({router, products, setMarket, admin, getMarket, storage, loading
                                     <ContentCard
                                         onClick={() => openInfo(el)}
                                         src={el.url}
-                                        header={el.price + '₽'}
+                                        header={el.price + ' ₽'}
                                         text={el.name}
                                         maxHeight={300}
                                     />

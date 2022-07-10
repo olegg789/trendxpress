@@ -5,7 +5,7 @@ import {
     PanelHeader,
     Tabs,
     TabsItem,
-    PullToRefresh
+    PullToRefresh, HorizontalScroll
 } from "@vkontakte/vkui";
 import OrdersList from "./orderslist";
 
@@ -43,7 +43,8 @@ function Orders({router, isDesktop, storage, dispatch, getOrders}) {
             <PanelHeader separator={storage.isDesktop}>Заказы</PanelHeader>
             <PullToRefresh onRefresh={() => getOrders()}>
                 <Group>
-                    <Tabs>
+                    <HorizontalScroll>
+                        <Tabs>
                         <TabsItem
                             selected={activeTab === 0}
                             onClick={() => {setActiveTab(0); filterOrders()}}
@@ -63,7 +64,10 @@ function Orders({router, isDesktop, storage, dispatch, getOrders}) {
                             Завершены
                         </TabsItem>
                     </Tabs>
-                    <OrdersList orders={filter} dispatch={dispatch}/>
+
+                    </HorizontalScroll>
+
+                    <OrdersList orders={filter} dispatch={dispatch} getOrders={() => getOrders()}/>
                 </Group>
             </PullToRefresh>
 

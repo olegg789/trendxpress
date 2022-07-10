@@ -25,6 +25,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
         arr.splice(index, 1);
         localStorage.setItem('cart', JSON.stringify(arr))
         setCount(count - 1)
+        calc()
     }
 
     function calc() {
@@ -64,7 +65,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                         Добавь нужные товары в корзину и возвращайся снова!
                     </Placeholder> :
                     <>
-                        <div style={{marginBottom: 150}}>
+                        <div style={ storage.isDesktop ? count >= 4 ? {marginBottom: 90} : {} : {marginBottom: 120}}>
                             <Header>Ваша корзина</Header>
 
                             {JSON.parse(localStorage.getItem('cart')).map((el, index) => {
@@ -108,7 +109,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                         </div>
 
 
-                        <FixedLayout vertical='bottom' filled>
+                        <FixedLayout vertical='bottom' filled className={storage.isDesktop ? count >= 4 ? 'fixedLayout' : 'fixedLayoutCart' : ''}>
                             <Separator wide/>
                             <Header mode='secondary'>Итого</Header>
                             <SimpleCell
@@ -119,7 +120,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                                     </span>
                                 }
                             >
-                                {price}₽
+                                {price} ₽
                             </SimpleCell>
                             <Div>
                                 <Button
