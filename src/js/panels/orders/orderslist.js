@@ -49,7 +49,7 @@ function OrdersList({router, orders, dispatch, getOrders}) {
                                 after={<IconButton onClick={() => openInfo(el)} icon={<Icon28InfoCircleOutline/>}/> }
                             >
                                 Товаров в заказе: {el.items.length} <br/>
-                                Сумма: {el.amount} ₽
+                                Сумма: <b>{el.amount} ₽</b>
                             </SimpleCell>
                         </FormItem>
                     )

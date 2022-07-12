@@ -84,7 +84,7 @@ function ViewOrders({router, dispatch, getOrders, orders, loading}) {
                                         >
                                             Заказ №{el.id} <br/>
                                             Товаров в заказе: {el.items.length} <br/>
-                                            Сумма: {el.amount} ₽
+                                            Сумма: <b>{el.amount} ₽</b>
                                         </SimpleCell>
                                     </FormItem>
                                 )

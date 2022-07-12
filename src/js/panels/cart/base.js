@@ -87,7 +87,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                                             disabled
                                         >
                                             <span className='name'>{el.name}</span> <br/>
-                                            <span className='count_cart'>{el.price} ₽</span>
+                                            <span className='count_cart'><b>{el.price} ₽</b></span>
                                         </SimpleCell>
                                     </>
                                 )
@@ -120,7 +120,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                                     </span>
                                 }
                             >
-                                {price} ₽
+                                <b>{price} ₽</b>
                             </SimpleCell>
                             <Div>
                                 <Button

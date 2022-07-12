@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { withRouter } from "@reyzitwo/react-router-vkminiapps";
 
 import {
@@ -10,11 +10,12 @@ import {
     Headline,
     Separator,
     FixedLayout,
-    Button, ButtonGroup, Alert,
+    Button, ButtonGroup, Alert, SimpleCell, FormItem,
 } from "@vkontakte/vkui";
 import {Icon28CheckCircleOutline, Icon28DeleteOutline, Icon28EditOutline} from "@vkontakte/icons";
 import api from "../../components/apiFunc";
 import bridge from "@vkontakte/vk-bridge";
+import {set} from "../../reducers/mainReducer";
 
 function InfoProduct({
      router,
@@ -27,8 +28,26 @@ function InfoProduct({
      admin,
      openSnackbar,
     getMarket,
-    setCart
+    setCart,
+    albums
 }) {
+
+    const [album, setAlbum] = useState({name: ''})
+
+    function findAlbum() {
+        if (storage.infoProduct.album_ids !== null) {
+            for (let i=0;i<=albums.length;i++) {
+                if (albums[i].id === Number(storage.infoProduct.album_ids)) {
+                    setAlbum(albums[i])
+                    return
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        findAlbum()
+    }, [])
 
     function addToCart(data) {
         let res = JSON.parse(localStorage.getItem('cart'))
@@ -118,6 +137,25 @@ function InfoProduct({
                     </Div>
 
                     <Separator/>
+
+                    {storage.infoProduct.album_ids !== null &&
+                    <>
+                        <FormItem top='Подборка'>
+                            <SimpleCell
+                                style={{marginTop: -5, marginBottom: -5}}
+                                onClick={() => {
+                                    dispatch(set({key: 'albumId', value: album.id}))
+                                    router.toPanel('album')
+                                }
+                                }
+                            >
+                                {album.name}
+                            </SimpleCell>
+                        </FormItem>
+
+                        <Separator/>
+                    </>
+                    }
 
                     <Div style={{whiteSpace: 'pre-line'}}>
                         {storage.infoProduct.description}

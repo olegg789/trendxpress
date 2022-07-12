@@ -24,6 +24,11 @@ const structure = [
 			},
 
 			{
+				id: 'about',
+				hash: ''
+			},
+
+			{
 				id: 'admin',
 				hash: ''
 			},

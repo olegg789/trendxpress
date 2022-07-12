@@ -22,37 +22,41 @@ function Album({router, storage}) {
     const [loading, setLoading] = useState(true)
 
     async function getMarket(offset) {
-        try {
-            if (!offset) {
-                let res = await api(`items?album_id=${storage.albumId}`, 'GET')
-                if (res.response) {
-                    setProducts(res.items)
+        if (need) {
+            try {
+                if (!offset) {
+                    let res = await api(`items?album_id=${storage.albumId}`, 'GET')
+                    if (res.response) {
+                        setProducts(res.items)
+                    }
                 }
-            }
-            else {
-                let res = await api(`items?offset=${offset}&limit=20&album_id=${storage.albumId}`, 'GET')
-                if (res.response) {
-                    let items = products
-                    items.reverse()
-                    // eslint-disable-next-line
-                    res.items.map((el) => {
-                        items.unshift(el)
-                    })
-                    setProducts(items.reverse())
-                }
-            }
-            setLoading(false)
-        }
-        catch (err) {
-            console.log(err)
-        }
-    }
+                else {
+                    let res = await api(`items?offset=${offset}&limit=20&album_id=${storage.albumId}`, 'GET')
+                    if (res.response) {
+                        if (res.items.length === 0) {
+                            setNeed(false)
+                            return
+                        }
 
-    function yes() {
-        console.log(1)
+                        let items = products
+                        // eslint-disable-next-line
+                        res.items.map((el) => {
+                            items.push(el)
+                        })
+                        setProducts(items)
+                    }
+                }
+                setLoading(false)
+                setNeed(false)
+            }
+            catch (err) {
+                console.log(err)
+            }
+        }
     }
 
     const [need, setNeed] = useState(true)
+    // eslint-disable-next-line
     const [result, setResult] = useState(true)
 
     function openInfo(data) {
@@ -64,6 +68,7 @@ function Album({router, storage}) {
         if (query.length === 0) {
             getMarket(0)
             setNeed(true)
+            setResult(true)
             return
         }
         let res = await api(`items?query=${query}&album_id=${storage.albumId}`, 'GET')
@@ -104,6 +109,7 @@ function Album({router, storage}) {
             left={
                 <PanelHeaderBack onClick={() => router.toBack()}/>
             }
+            separator={storage.isDesktop}
         >
             Подборка
         </PanelHeader>
@@ -121,9 +127,10 @@ function Album({router, storage}) {
                         }}
                         style={{marginBottom: 10}}
                     />
+                    {result ?
                         <InfScroll
-                            onReachEnd={() => {need && getMarket(products.length)}}
-                            loader={need ? <Spinner size="regular" style={{ height: 60 }}/> : null}
+                            onReachEnd={() => {products.length >= 20 && setNeed(true); getMarket(products.length)}}
+                            loader={need && products.length >= 20 ? <Spinner size="regular" style={{ height: 60 }}/> : null}
                         >
                             <CardGrid size='l' className='products'>
                                 {products.map((el) => {
@@ -138,7 +145,9 @@ function Album({router, storage}) {
                                     )
                                 })}
                             </CardGrid>
-                        </InfScroll>
+                        </InfScroll> :
+                        <Placeholder>Ничего не найдено</Placeholder>
+                    }
                 </> :
                 <Placeholder>Ничего не найдено</Placeholder>}
         </Group>

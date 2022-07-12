@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useRef, useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
     CardGrid,
@@ -8,9 +8,11 @@ import {
     Placeholder,
     Search,
     Spinner,
-    ContentCard, Header, Footer, Link, Separator, Button
+    ContentCard,
+    Header,
+    Button
 } from "@vkontakte/vkui";
-import {Icon28UserStarBadgeOutline} from "@vkontakte/icons";
+import {Icon28ShieldKeyholeOutline, Icon28UserStarBadgeOutline} from "@vkontakte/icons";
 import {useDispatch} from "react-redux";
 import {set} from "../../reducers/mainReducer";
 import {InfScroll} from "@vkma/infscroll";
@@ -66,10 +68,17 @@ function Market({router, products, setMarket, admin, getMarket, storage, loading
     return (
         <>
         <PanelHeader
-            left={admin &&
-                <PanelHeaderButton onClick={() => router.toPanel('admin')}>
-                    <Icon28UserStarBadgeOutline/>
-                </PanelHeaderButton>
+            left={
+                <>
+                    <PanelHeaderButton onClick={() => router.toPanel('about')}>
+                        <Icon28ShieldKeyholeOutline/>
+                    </PanelHeaderButton>
+                    {admin &&
+                    <PanelHeaderButton onClick={() => router.toPanel('admin')}>
+                        <Icon28UserStarBadgeOutline/>
+                    </PanelHeaderButton>}
+                </>
+
             }
             separator={storage.isDesktop}
         >
@@ -153,7 +162,7 @@ function Market({router, products, setMarket, admin, getMarket, storage, loading
                                     <ContentCard
                                         onClick={() => openInfo(el)}
                                         src={el.url}
-                                        header={el.price + ' ₽'}
+                                        header={<b>{el.price} ₽</b>}
                                         text={el.name}
                                         maxHeight={300}
                                     />

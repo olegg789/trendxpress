@@ -15,7 +15,7 @@ import {
 } from "@vkontakte/vkui";
 import declOfNum from "../../components/declOfNum";
 import api from "../../components/apiFunc";
-import {Icon28CheckCircleOutline} from "@vkontakte/icons";
+import {Icon28CancelCircleOutline, Icon28CheckCircleOutline} from "@vkontakte/icons";
 
 function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
 
@@ -53,14 +53,31 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                     'comment': comment
                 }
             )
-            console.log(res)
             if (res.response) {
-                console.log('Заказ отправлен')
                 router.toBack()
                 localStorage.setItem('cart', "[]")
                 setCount(0)
                 getOrders()
                 openSnackbar('Заказ оформлен!', <Icon28CheckCircleOutline className='snack_suc'/>)
+            }
+            else {
+                if (res.error.code === 3) {
+                    if (res.error.param === 'address') {
+                        openSnackbar('Произошла ошибка! Некорректный адрес!', <Icon28CancelCircleOutline className='snack_err'/>)
+                    }
+                    else if (res.error.param === 'recipient') {
+                        openSnackbar('Произошла ошибка! Некорректный получатель!', <Icon28CancelCircleOutline className='snack_err'/>)
+                    }
+                    else if (res.error.param === 'phone') {
+                        openSnackbar('Произошла ошибка! Некорректный номер телефона!', <Icon28CancelCircleOutline className='snack_err'/>)
+                    }
+                    else if (res.error.param === 'email') {
+                        openSnackbar('Произошла ошибка! Некорректная электронная почта!', <Icon28CancelCircleOutline className='snack_err'/>)
+                    }
+                    else if (res.error.param === 'comment') {
+                        openSnackbar('Произошла ошибка! Некорректный комментарий!', <Icon28CancelCircleOutline className='snack_err'/>)
+                    }
+                }
             }
         }
         catch (err) {
@@ -78,7 +95,11 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                             <Textarea
                                 placeholder='г. Санкт-Петербург, Невский проспект, д. 28, БЦ "Зингеръ"'
                                 value={address}
-                                onChange={(e) => setAddress(e.currentTarget.value.replace(/^\s+/g, ''))}
+                                onChange={(e) => {
+                                    if (e.currentTarget.value.length > 200) return
+                                    setAddress(e.currentTarget.value.replace(/^\s+/g, ''))
+                                }}
+                                maxLength={200}
                             />
                         </FormItem>
 
@@ -86,7 +107,11 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                             <Input
                                 placeholder='Иванов Иван Иванович'
                                 value={recipient}
-                                onChange={(e) => setRecipient(e.currentTarget.value.replace(/^\s+/g, ''))}
+                                onChange={(e) => {
+                                    if (e.currentTarget.value.length > 100) return
+                                    setRecipient(e.currentTarget.value.replace(/^\s+/g, ''))
+                                }}
+                                maxLength={100}
                             />
                         </FormItem>
 
@@ -108,14 +133,22 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                             <Input
                                 placeholder='ivanIvanov@gmail.com'
                                 value={email}
-                                onChange={(e) => setEmail(e.currentTarget.value.replace(/^\s+/g, ''))}
+                                onChange={(e) => {
+                                    if (e.currentTarget.value.length > 100) return
+                                    setEmail(e.currentTarget.value.replace(/^\s+/g, ''))
+                                }}
+                                maxLength={100}
                             />
                         </FormItem>
 
                         <FormItem top='Комментарий (необязательно)'>
                             <Textarea
                                 value={comment}
-                                onChange={(e) => setComment(e.currentTarget.value.replace(/^\s+/g, ''))}
+                                onChange={(e) => {
+                                    if (e.currentTarget.value.length > 1000) return
+                                    setComment(e.currentTarget.value.replace(/^\s+/g, ''))
+                                }}
+                                maxLength={1000}
                             />
                         </FormItem>
                     </FormLayout>
@@ -128,8 +161,8 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                         disabled
                         after={
                             <span className='count_cart'>
-                                        {JSON.parse(localStorage.getItem('cart')).length} {declOfNum(JSON.parse(localStorage.getItem('cart')).length, ["товар", "товара", "товаров"])}
-                                    </span>
+                                {JSON.parse(localStorage.getItem('cart')).length} {declOfNum(JSON.parse(localStorage.getItem('cart')).length, ["товар", "товара", "товаров"])}
+                            </span>
                         }
                     >
                         {storage.price} ₽

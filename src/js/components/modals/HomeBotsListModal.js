@@ -97,11 +97,12 @@ function OrderInfoAdmin({ nav, router, storage, dispatch }) {
                             before={
                                 <Avatar size={75} mode='image' src={el.url}/>
                             }
-                            after={<span className='count_cart'>{el.price} ₽</span>}
+                            after={<span className='count_cart'>{el.price * el.count} ₽</span>}
                             style={{marginBottom: 5}}
                             disabled
                         >
-                            <span className='name' style={{marginRight: 5}}>{el.name}</span>
+                            <span className='name' style={{marginRight: 5}}>{el.name}</span> <br/>
+                            <span className='count_cart'>Количество: {el.count}</span>
                         </SimpleCell>
                     )
                 })

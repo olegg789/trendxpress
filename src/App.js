@@ -42,6 +42,7 @@ import AddAlbum from "./js/panels/home/admin/addAlbum";
 import EditAlbums from "./js/panels/home/admin/editAlbums";
 import EditAlbum from "./js/panels/home/admin/editAlbum";
 import Album from "./js/panels/home/album";
+import About from "./js/panels/home/About";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
   const mainStorage = useSelector((state) => state.main)
@@ -251,10 +252,6 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                   {snackbar}
                 </Panel>
 
-                <Panel id='album'>
-                  <Album storage={mainStorage}/>
-                </Panel>
-
                 <Panel id='infoProduct'>
                   <InfoProduct
                       storage={mainStorage}
@@ -267,8 +264,17 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       admin={admin}
                       openSnackbar={(text, icon) => openSnackbar(text, icon)}
                       getMarket={(offset) => getMarket(offset)}
+                      albums={albums}
                   />
                   {snackbar}
+                </Panel>
+
+                <Panel id='album'>
+                  <Album storage={mainStorage}/>
+                </Panel>
+
+                <Panel id='about'>
+                  <About/>
                 </Panel>
 
                 <Panel id='admin'>

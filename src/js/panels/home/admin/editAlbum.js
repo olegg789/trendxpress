@@ -10,8 +10,7 @@ import {
     Group,
     Input,
     PanelHeader,
-    PanelHeaderBack,
-    Textarea
+    PanelHeaderBack
 } from "@vkontakte/vkui";
 import api from "../../../components/apiFunc";
 import {
