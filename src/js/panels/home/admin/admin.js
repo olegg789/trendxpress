@@ -57,6 +57,15 @@ function Admin({router}) {
                     </Button>
                 </FormItem>
 
+                <FormItem top='Настройки'>
+                    <Button
+                        size='l'
+                        stretched
+                        onClick={() => router.toPanel('settings')}
+                    >
+                        Открыть
+                    </Button>
+                </FormItem>
             </Group>
         </>
     )

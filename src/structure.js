@@ -66,7 +66,12 @@ const structure = [
 			{
 				id: 'editAlbum',
 				hash: ''
-			}
+			},
+
+			{
+				id: 'settings',
+				hash: ''
+			},
 
 		]
 	},

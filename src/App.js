@@ -45,6 +45,7 @@ import Album from "./js/panels/home/album";
 import About from "./js/panels/home/About";
 import ViewReviews from "./js/panels/home/admin/viewReviews";
 import AddReview from "./js/panels/home/admin/addReview";
+import Settings from "./js/panels/home/admin/settings";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
   const mainStorage = useSelector((state) => state.main)
@@ -55,6 +56,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   const [admin, setAdmin] = useState(false)
   const [market, setMarket] = useState([])
   const [ordersAdmin, setOrdersAdmin] = useState([])
+  const [adminSettings, setAdminSettings] = useState({})
   const [reviewsAdmin, setReviewsAdmin] = useState([])
   const [loading, setLoading] = useState(true)
   const [snackbar, setSnackbar] = useState(null)
@@ -184,6 +186,20 @@ const App = withAdaptivity(({ viewWidth, router }) => {
       let res = await api('admin/reviews', 'GET')
       if (res.response) {
         setReviewsAdmin(res.reviews)
+        setLoading(false)
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
+  async function getSettings() {
+    try {
+      setLoading(true)
+      let res = await api('admin/settings', 'GET')
+      if (res.response) {
+        setAdminSettings(res.config)
         setLoading(false)
       }
     }
@@ -359,6 +375,15 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                   <EditAlbums
                       albums={albums}
                       getAlbums={() => getAlbums()}
+                      openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                  />
+                  {snackbar}
+                </Panel>
+
+                <Panel id='settings'>
+                  <Settings
+                      settings={adminSettings}
+                      getSettings={() => getSettings()}
                       openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
                   />
                   {snackbar}
