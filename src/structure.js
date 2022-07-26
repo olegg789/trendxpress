@@ -44,6 +44,16 @@ const structure = [
 			},
 
 			{
+				id: 'viewReviews',
+				hash: ''
+			},
+
+			{
+				id: 'addReview',
+				hash: ''
+			},
+
+			{
 				id: 'addAlbum',
 				hash: ''
 			},

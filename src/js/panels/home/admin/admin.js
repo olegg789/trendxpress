@@ -47,6 +47,16 @@ function Admin({router}) {
                     </Button>
                 </FormItem>
 
+                <FormItem top='Отзывы'>
+                    <Button
+                        size='l'
+                        stretched
+                        onClick={() => router.toPanel('viewReviews')}
+                    >
+                        Открыть
+                    </Button>
+                </FormItem>
+
             </Group>
         </>
     )

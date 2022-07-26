@@ -43,6 +43,8 @@ import EditAlbums from "./js/panels/home/admin/editAlbums";
 import EditAlbum from "./js/panels/home/admin/editAlbum";
 import Album from "./js/panels/home/album";
 import About from "./js/panels/home/About";
+import ViewReviews from "./js/panels/home/admin/viewReviews";
+import AddReview from "./js/panels/home/admin/addReview";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
   const mainStorage = useSelector((state) => state.main)
@@ -53,6 +55,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   const [admin, setAdmin] = useState(false)
   const [market, setMarket] = useState([])
   const [ordersAdmin, setOrdersAdmin] = useState([])
+  const [reviewsAdmin, setReviewsAdmin] = useState([])
   const [loading, setLoading] = useState(true)
   const [snackbar, setSnackbar] = useState(null)
   const [loadingMain, setLoadingMain] = useState(true)
@@ -168,6 +171,20 @@ const App = withAdaptivity(({ viewWidth, router }) => {
       let res = await api('orders', 'GET')
       if (res.response) {
         dispatch(set({key: 'orders', value: res.orders}))
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
+  async function getReviews() {
+    try {
+      setLoading(true)
+      let res = await api('admin/reviews', 'GET')
+      if (res.response) {
+        setReviewsAdmin(res.reviews)
+        setLoading(false)
       }
     }
     catch (err) {
@@ -301,6 +318,15 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                   {snackbar}
                 </Panel>
 
+                <Panel id='addReview'>
+                  <AddReview
+                      getReviews={() => getReviews()}
+                      openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                      storage={mainStorage}
+                  />
+                  {snackbar}
+                </Panel>
+
                 <Panel id='viewOrders'>
                   <ViewOrders
                       dispatch={(value) => dispatch(value)}
@@ -309,6 +335,16 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       loading={loading}
                   />
                   {snackbar}
+                </Panel>
+
+                <Panel id='viewReviews'>
+                    <ViewReviews
+                        openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                        getReviews={() => getReviews()}
+                        reviews={reviewsAdmin}
+                        loading={loading}
+                    />
+                    {snackbar}
                 </Panel>
 
                 <Panel id='addAlbum'>
