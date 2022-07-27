@@ -32,6 +32,18 @@ function ViewReviews({router, openSnackbar, getReviews, reviews, loading}) {
         }
     }
 
+    async function approveReview(data) {
+        let response = await api(
+            "admin/reviews/" + data.id,
+            "PATCH"
+        );
+
+        if (response.response) {
+            openSnackbar('Отзыв одобрен!', <Icon28CheckCircleOutline className='snack_suc'/>)
+            getReviews()
+        }
+    }
+
     useEffect(() => {
         getReviews()
     }, [])
@@ -70,6 +82,12 @@ function ViewReviews({router, openSnackbar, getReviews, reviews, loading}) {
                                         />}
                                         after={
                                             <>
+                                                <IconButton
+                                                    onClick={() => approveReview(el)}
+                                                    icon={<Icon28CheckCircleOutline/>}
+                                                    style={{marginRight: 10}}
+                                                />
+
                                                 <IconButton
                                                     onClick={() => deleteReview(el)}
                                                     icon={<Icon28DeleteOutlineAndroid/>}

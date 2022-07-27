@@ -8,11 +8,16 @@ import {
     Gallery,
     Div,
     Headline,
+    Title,
     Separator,
     FixedLayout,
-    Button, ButtonGroup, Alert, SimpleCell, FormItem,
+    Button, ButtonGroup, Alert, SimpleCell, FormItem, Avatar,
 } from "@vkontakte/vkui";
-import {Icon28CheckCircleOutline, Icon28DeleteOutline, Icon28EditOutline} from "@vkontakte/icons";
+import {
+    Icon28CheckCircleOutline,
+    Icon28DeleteOutline,
+    Icon28EditOutline
+} from "@vkontakte/icons";
 import api from "../../components/apiFunc";
 import bridge from "@vkontakte/vk-bridge";
 import {set} from "../../reducers/mainReducer";
@@ -31,7 +36,6 @@ function InfoProduct({
     setCart,
     albums
 }) {
-
     const [album, setAlbum] = useState({name: ''})
 
     function findAlbum() {
@@ -159,6 +163,38 @@ function InfoProduct({
 
                     <Div style={{whiteSpace: 'pre-line'}}>
                         {storage.infoProduct.description}
+                    </Div>
+
+                    <Div style={{whiteSpace: 'pre-line'}}>
+                        <Title
+                            level={3}
+                        >
+                            Отзывы
+                        </Title>
+                    </Div>
+
+                    {storage.reviews.map((el,key) => <SimpleCell
+                        disabled
+                        key={key}
+                        before={<Avatar
+                            src={el.avatar}
+                        />}
+                        multiline
+                        expandable
+                        description={el.comment}
+                    >
+                        {el.name}, {"⭐️".repeat(el.stars)}
+                    </SimpleCell>)}
+
+                    <Div>
+                        <Button
+                            stretched
+                            onClick={() => router.toPanel("addUserReview")}
+                            mode={"secondary"}
+                            size={"l"}
+                        >
+                            Оставить отзыв
+                        </Button>
                     </Div>
                 </div>
 

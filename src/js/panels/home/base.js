@@ -1,4 +1,4 @@
-import React, {useCallback, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {withRouter} from "@reyzitwo/react-router-vkminiapps";
 import {
     CardGrid,
@@ -19,7 +19,7 @@ import {InfScroll} from "@vkma/infscroll";
 import api from "../../components/apiFunc";
 import declOfNum from "../../components/declOfNum";
 
-function Market({router, products, setMarket, admin, getMarket, storage, loading, setLoading, albums}) {
+function Market({router, products, setMarket, admin, getUserReviews, getMarket, storage, loading, setLoading, albums}) {
     const dispatch = useDispatch()
 
     const [need, setNeed] = useState(true)
@@ -30,6 +30,12 @@ function Market({router, products, setMarket, admin, getMarket, storage, loading
         dispatch(set({key: 'infoProduct', value: data}))
         router.toPanel('infoProduct')
     }
+
+    useEffect(() => {
+        if (!storage.reviews) {
+            getUserReviews()
+        }
+    }, [])
 
     const search = useDebounce(async (query) => {
         if (query.length === 0) {

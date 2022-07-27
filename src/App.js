@@ -46,6 +46,7 @@ import About from "./js/panels/home/About";
 import ViewReviews from "./js/panels/home/admin/viewReviews";
 import AddReview from "./js/panels/home/admin/addReview";
 import Settings from "./js/panels/home/admin/settings";
+import AddUserReview from "./js/panels/home/addUserReview";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
   const mainStorage = useSelector((state) => state.main)
@@ -180,6 +181,18 @@ const App = withAdaptivity(({ viewWidth, router }) => {
     }
   }
 
+  async function getUserReviews() {
+    try {
+      let res = await api('reviews', 'GET')
+      if (res.response) {
+        dispatch(set({key: 'reviews', value: res.reviews}))
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
   async function getReviews() {
     try {
       setLoading(true)
@@ -276,6 +289,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                         products={market}
                         declOfNum={(number, words) => declOfNum(number, words)}
                         admin={admin}
+                        getUserReviews={() => getUserReviews()}
                         getMarket={(offset) => getMarket(offset)}
                         setMarket={(value) => setMarket(value)}
                         loading={loadingMain}
@@ -337,6 +351,14 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                 <Panel id='addReview'>
                   <AddReview
                       getReviews={() => getReviews()}
+                      openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
+                      storage={mainStorage}
+                  />
+                  {snackbar}
+                </Panel>
+
+                <Panel id='addUserReview'>
+                  <AddUserReview
                       openSnackbar={(text, icon, action) => openSnackbar(text, icon, action)}
                       storage={mainStorage}
                   />

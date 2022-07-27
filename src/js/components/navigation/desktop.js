@@ -6,7 +6,7 @@ import {
     SplitCol,
     Panel,
     PanelHeader,
-    SimpleCell
+    SimpleCell,
 } from '@vkontakte/vkui';
 import {
     Icon28MarketOutline,
@@ -16,7 +16,6 @@ import {
 
 function DesktopNavigation({ router }) {
   const hasHeader = useSelector((state) => state.main.hasHeader)
-
 	return(
     <SplitCol fixed width='280px' maxWidth='280px'>
       <Panel id='menuDesktop'>
