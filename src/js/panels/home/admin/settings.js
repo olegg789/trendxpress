@@ -16,16 +16,20 @@ import api from "../../../components/apiFunc";
 
 let sortByOptions = [
     {
-        label: "По цене",
+        label: "По возрастанию цены",
         value: 0,
     },
     {
-        label: "Количеству продаж",
+        label: "По убыванию цены",
         value: 1,
     },
     {
-        label: "Новизне",
+        label: "Хиты продаж",
         value: 2,
+    },
+    {
+        label: "Новые товары",
+        value: 3,
     }
 ]
 

@@ -105,16 +105,18 @@ const App = withAdaptivity(({ viewWidth, router }) => {
     getOrders()
   }
 
-  async function getMarket(offset) {
+  async function getMarket(offset = null, sortByProp = 0) {
+    console.log(sortByProp)
+    const sort = sortByProp === 0 ? '' : sortByProp-1
     setLoadingMain(true)
     if (!offset) {
-      let res = await api(`items`, 'GET')
+      let res = await api(`items?sortBy=${sort}`, 'GET')
       if (res.response) {
         setMarket(res.items)
       }
     }
     else {
-      let res = await api(`items?offset=${offset}&limit=20`, 'GET')
+      let res = await api(`items?offset=${offset}&limit=20&sortBy=${sort}`, 'GET')
       if (res.response) {
         let items = market
         items.reverse()
@@ -290,7 +292,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                         declOfNum={(number, words) => declOfNum(number, words)}
                         admin={admin}
                         getUserReviews={() => getUserReviews()}
-                        getMarket={(offset) => getMarket(offset)}
+                        getMarket={(offset, sortBy) => getMarket(offset, sortBy)}
                         setMarket={(value) => setMarket(value)}
                         loading={loadingMain}
                         setLoading={(value) => setLoadingMain(value)}
