@@ -79,6 +79,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
       }
     })
     let appScheme = await bridge.send("VKWebAppGetConfig")
+    bridge.send("VKWebAppRetargetingPixel", {"pixel_code": "VK-RTRG-1485255-aAnNo", "event": "join"});
     setScheme(appScheme.scheme)
   }
 
