@@ -18,6 +18,7 @@ import { Icon24Dismiss, Icon24Cancel } from '@vkontakte/icons'
 function OrderInfoAdmin({ nav, router, storage, dispatch }) {
     const platform = useSelector((state) => state.main.platform)
 
+    console.log(storage.orderInfoAdmin)
     return (
         <ModalPage
             nav={nav}
@@ -63,7 +64,7 @@ function OrderInfoAdmin({ nav, router, storage, dispatch }) {
                             Почта: {storage.orderInfoAdmin.email}
                         </span>
                     </SimpleCell>
-                    {storage.orderInfoAdmin.comment.length !== 0 &&
+                    {storage.orderInfoAdmin.comment && storage.orderInfoAdmin.comment.length !== 0 &&
                     <SimpleCell disabled style={{marginTop: -20}}>
                         <span className='name'>
                             Комментарий: {storage.orderInfoAdmin.comment}
