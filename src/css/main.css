@@ -201,3 +201,107 @@ body :root {
 .vkuiRadio__input:checked~ .vkuiRadio__container .vkuiRadio__icon .vkuiRadio__pin {
     color: var(--vkui--color_accent_blue)
 }
+
+.items_container {
+    column-count: 2;
+    padding-left: 5px;
+    padding-right: 5px;
+    display: flex
+}
+
+@media (max-width: 768px) {
+    .vkuiContentCard__img {
+        height: 220px;
+        border-radius: 5px;
+    }
+}
+
+@media (min-width: 768px) {
+    .vkuiContentCard__img {
+        height: 300px;
+        border-radius: 5px;
+        cursor: pointer !important;
+    }
+}
+
+.vkuiPanel.vkuiPanel--regular .vkuiPanel__in, .vkuiPanel.vkuiPanel--regular::after {
+    background-color: transparent;
+    padding-bottom: 0;
+}
+
+.basePanel {
+    overflow-y: hidden;
+}
+
+.vkuiContentCard {
+    max-height: 500px;
+    overflow-wrap: break-word;
+    border-radius: 5px;
+    background-color: transparent;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.vkuiContentCard__text {
+    font-size: 13px;
+}
+
+.vkuiContentCard__body {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.locations {
+    display: flex;
+    flex-wrap: wrap;
+}
+.location {
+    background: rgb(0, 0, 0, 0.5);
+    border-radius: 9px;
+    align-items: center;
+    margin: 0 5px;
+    width: 90px;
+}
+.location, .locations {
+    justify-content: space-around;
+}
+
+.location-header {
+    color: white;
+}
+
+.home-header {
+    -webkit-user-select: none;
+    user-select: none;
+    margin-top: -15px;
+}
+
+.infoProductDesktop {
+    column-count: 2;
+}
+
+.albumName {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: manual;
+}
+
+.album {
+    transform: scale(1);
+}
+
+.productAlbum {
+    margin-top: 5px;
+    margin-left: -15px;
+    margin-right: -5px;
+}
+
+.sortIcon {
+    cursor: pointer;
+}
+
+.sortIcon:hover {
+    border-radius: 25px;
+    background-color: rgba(0, 0, 0, 0.3);
+}

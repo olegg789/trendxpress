@@ -40,6 +40,8 @@ function ViewOrders({router, dispatch, getOrders, orders, loading}) {
         getOrders()
     }, [])
 
+    console.log(orders)
+
     return (
         <>
             <PanelHeader
@@ -63,7 +65,7 @@ function ViewOrders({router, dispatch, getOrders, orders, loading}) {
                                     minute: 'numeric'
                                 });
                                 return(
-                                    <FormItem top={'Заказ от ' + date} bottom={'Статус: ' + statuses[el.status]}>
+                                    <FormItem top={'Заказ от ' + date} bottom={<>Статус: <span className={el.status === 2 ? 'snack_err' : ''}>{statuses[el.status]}</span></>}>
                                         <SimpleCell
                                             style={{marginTop: -10, marginBottom: -10}}
                                             disabled
@@ -84,7 +86,8 @@ function ViewOrders({router, dispatch, getOrders, orders, loading}) {
                                         >
                                             Заказ №{el.id} <br/>
                                             Товаров в заказе: {el.items.length} <br/>
-                                            Сумма: <b>{el.amount} ₽</b>
+                                            Сумма: <b>{el.amount} ₽</b> <br/>
+                                            Оплачен: {el.payed ? 'Да' : 'Нет'}
                                         </SimpleCell>
                                     </FormItem>
                                 )

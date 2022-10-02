@@ -16,15 +16,26 @@ import {
 import declOfNum from "../../components/declOfNum";
 import api from "../../components/apiFunc";
 import {Icon28CancelCircleOutline, Icon28CheckCircleOutline} from "@vkontakte/icons";
+import bridge from "@vkontakte/vk-bridge";
+import {useDispatch} from "react-redux";
+import {set} from "../../reducers/mainReducer";
 
-function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
+function NewOrder({router,storage, openSnackbar, setCount, getOrders, showNotifies}) {
+    const dispatch = useDispatch()
 
-    const [address, setAddress] = useState('')
-    const [recipient, setRecipient] = useState('')
-    const [phone, setPhone] = useState('')
-    const [comment, setComment] = useState('')
     const [items, setItems] = useState([])
-    const [email, setEmail]  = useState('')
+    const [price, setPrice] = useState(0)
+
+    function calc() {
+        if (JSON.parse(localStorage.getItem('cart')).length !== 0) {
+            const count = JSON.parse(localStorage.getItem('cart')).length - 1
+            let res = 0
+            for (let i=0;i<=count;i++) {
+                res = res + Number(JSON.parse(localStorage.getItem('cart'))[i].price)
+            }
+            setPrice(res)
+        }
+    }
 
     function getItemsIds() {
         // eslint-disable-next-line
@@ -36,21 +47,75 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
     }
 
     useEffect(() => {
-        getItemsIds()
+        getItemsIds();
+        calc()
+    }, [])
+
+
+    async function getUserInfo() {
+        try {
+            bridge.send("VKWebAppGetUserInfo").then(
+                data => {
+                    let name = data.last_name + ' ' + data.first_name
+                    dispatch(set({key: 'name', value: name}))
+                })
+            bridge.send("VKWebAppGetPersonalCard", {type: ['phone', 'email', "address"]}).then(
+                data => {
+                    if (data.phone.length > 0) {
+                        let phone = data.phone
+                            .replace('+', '')
+                            .replace(/ /g, '')
+                            .replace('(', '')
+                            .replace(')', '')
+                            .replace(/-/g, '')
+
+                        dispatch(set({key: 'phone', value: phone}))
+                    }
+                    if (data.email.length > 0) {
+                        dispatch(set({key: 'email', value: data.email}))
+                    }
+                    if (data.address) {
+                        let address = `г. ${data.address.city.name} ${data.address.specified_address}, ${data.address.postal_code}`
+                        dispatch(set({key: 'address', value: address}))
+                    }
+                }
+            )
+            dispatch(set({key: 'hasInfo', value: true}))
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        if (!storage.hasInfo) {
+            getUserInfo()
+        }
     }, [])
 
     async function newOrder() {
         try {
+            try {
+                await bridge.send('VKWebAppAllowMessagesFromGroup', {group_id: 212830043})
+            }
+            catch (err) {
+                if (err.error_data.error_code === 4) {
+                    openSnackbar('Для оформления заказа необходимо разрешить отправку сообщений от группы',
+                        <Icon28CancelCircleOutline className='snack_err'/>)
+                    return
+                }
+            }
+
             let res = await api(
                 'orders',
                 'POST',
                 {
                     'items': items,
-                    'address': address,
-                    'recipient': recipient,
-                    'phone': phone,
-                    'email': email,
-                    'comment': comment
+                    'address': storage.address,
+                    'recipient': storage.name,
+                    'phone': storage.phone,
+                    'email': storage.email,
+                    'comment': storage.comment
                 }
             )
             if (res.response) {
@@ -58,46 +123,62 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                 localStorage.setItem('cart', "[]")
                 setCount(0)
                 getOrders()
+                dispatch(set({key: 'order_id', value: res.id}))
+                dispatch(set({key: 'amount', value: res.amount}))
+                showNotifies()
                 openSnackbar('Заказ оформлен!', <Icon28CheckCircleOutline className='snack_suc'/>)
-            }
-            else {
+                router.toModal('payment')
+            } else {
                 if (res.error.code === 3) {
                     if (res.error.param === 'address') {
-                        openSnackbar('Произошла ошибка! Некорректный адрес!', <Icon28CancelCircleOutline className='snack_err'/>)
+                        openSnackbar('Произошла ошибка! Некорректный адрес!', <Icon28CancelCircleOutline
+                            className='snack_err'/>)
+                    } else if (res.error.param === 'recipient') {
+                        openSnackbar('Произошла ошибка! Некорректный получатель!', <Icon28CancelCircleOutline
+                            className='snack_err'/>)
+                    } else if (res.error.param === 'phone') {
+                        openSnackbar('Произошла ошибка! Некорректный номер телефона!',
+                            <Icon28CancelCircleOutline className='snack_err'/>)
+                    } else if (res.error.param === 'email') {
+                        openSnackbar('Произошла ошибка! Некорректная электронная почта!',
+                            <Icon28CancelCircleOutline className='snack_err'/>)
+                    } else if (res.error.param === 'comment') {
+                        openSnackbar('Произошла ошибка! Некорректный комментарий!', <Icon28CancelCircleOutline
+                            className='snack_err'/>)
                     }
-                    else if (res.error.param === 'recipient') {
-                        openSnackbar('Произошла ошибка! Некорректный получатель!', <Icon28CancelCircleOutline className='snack_err'/>)
-                    }
-                    else if (res.error.param === 'phone') {
-                        openSnackbar('Произошла ошибка! Некорректный номер телефона!', <Icon28CancelCircleOutline className='snack_err'/>)
-                    }
-                    else if (res.error.param === 'email') {
-                        openSnackbar('Произошла ошибка! Некорректная электронная почта!', <Icon28CancelCircleOutline className='snack_err'/>)
-                    }
-                    else if (res.error.param === 'comment') {
-                        openSnackbar('Произошла ошибка! Некорректный комментарий!', <Icon28CancelCircleOutline className='snack_err'/>)
-                    }
+                } else if (res.error.code === 9) {
+                    openSnackbar('Произошла ошибка! Превышен лимит активных заказов!',
+                        <Icon28CancelCircleOutline className='snack_err'/>)
                 }
             }
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err)
         }
+    }
+
+    async function onChange(name, value) {
+        dispatch(set({key: name, value: value}))
     }
 
     return(
         <>
         <PanelHeader separator={storage.isDesktop} left={<PanelHeaderBack onClick={() => router.toBack()}/> }>Новый заказ</PanelHeader>
             <Group>
-                <div style={ storage.isDesktop ? {marginBottom: 90} : {marginBottom: 150}}>
+                <div style={ {marginBottom: 150}}>
                     <FormLayout>
                         <FormItem top='Адрес доставки'>
                             <Textarea
                                 placeholder='г. Санкт-Петербург, Невский проспект, д. 28, БЦ "Зингеръ"'
-                                value={address}
+                                value={storage.address}
                                 onChange={(e) => {
                                     if (e.currentTarget.value.length > 200) return
-                                    setAddress(e.currentTarget.value.replace(/^\s+/g, ''))
+                                    onChange(
+                                        'address',
+                                        e.currentTarget.value
+                                            .replace(/^\s+/g, '')
+                                            .replace(/[+]/g, '')
+                                            .replace(/[-]/g, '')
+                                    )
                                 }}
                                 maxLength={200}
                             />
@@ -106,10 +187,10 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                         <FormItem top='Получатель'>
                             <Input
                                 placeholder='Иванов Иван Иванович'
-                                value={recipient}
+                                value={storage.name}
                                 onChange={(e) => {
                                     if (e.currentTarget.value.length > 100) return
-                                    setRecipient(e.currentTarget.value.replace(/^\s+/g, ''))
+                                    onChange('name', e.currentTarget.value.replace(/^\s+/g, ''))
                                 }}
                                 maxLength={100}
                             />
@@ -118,12 +199,16 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                         <FormItem top='Телефон'>
                             <Input
                                 placeholder='70000000000'
-                                type='number'
-                                maxLength={11}
-                                value={phone}
+                                value={storage.phone}
+                                type='phone'
                                 onChange={(e) => {
                                     if (e.currentTarget.value.length > 11) return
-                                    setPhone(e.currentTarget.value.replace(/^\s+/g, ''))
+                                    onChange(
+                                        'phone',
+                                        e.currentTarget.value
+                                            .replace(/^\s+/g, '')
+                                            .replace(/[^0-9]/g, '')
+                                    )
                                 }}
                                 name='phone'
                             />
@@ -132,21 +217,22 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                         <FormItem top='Электронная почта'>
                             <Input
                                 placeholder='ivanIvanov@gmail.com'
-                                value={email}
+                                value={storage.email}
                                 onChange={(e) => {
                                     if (e.currentTarget.value.length > 100) return
-                                    setEmail(e.currentTarget.value.replace(/^\s+/g, ''))
+                                    onChange('email', e.currentTarget.value.replace(/^\s+/g, ''))
                                 }}
                                 maxLength={100}
+                                type='email'
                             />
                         </FormItem>
 
                         <FormItem top='Комментарий (необязательно)'>
                             <Textarea
-                                value={comment}
+                                value={storage.comment}
                                 onChange={(e) => {
                                     if (e.currentTarget.value.length > 1000) return
-                                    setComment(e.currentTarget.value.replace(/^\s+/g, ''))
+                                    onChange('comment', e.currentTarget.value.replace(/^\s+/g, ''))
                                 }}
                                 maxLength={1000}
                             />
@@ -165,7 +251,7 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                             </span>
                         }
                     >
-                        {storage.price} ₽
+                        <b>{price} ₽</b>
                     </SimpleCell>
                     <Div>
                         <Button
@@ -173,7 +259,12 @@ function NewOrder({router,storage, openSnackbar, setCount, getOrders}) {
                             stretched
                             onClick={() => newOrder()}
                             disabled={
-                                address.length === 0 || recipient.length === 0 || email.length === 0 || phone.length !== 11
+                                !storage.address ||
+                                !storage.name ||
+                                !storage.email ||
+                                !storage.phone ||
+                                storage.phone.length < 11 ||
+                                !storage.email.includes('@')
                             }
                         >
                             Оформить заказ

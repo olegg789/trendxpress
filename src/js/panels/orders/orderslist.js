@@ -22,9 +22,11 @@ function OrdersList({router, orders, dispatch, getOrders}) {
     ]
 
     function openInfo(data) {
-        dispatch(set({key: 'orderInfo', value: data.items}))
+        dispatch(set({key: 'orderInfo', value: data}))
         router.toModal('orderInfo')
     }
+
+    console.log(orders)
 
     return (
         <>
@@ -42,14 +44,15 @@ function OrdersList({router, orders, dispatch, getOrders}) {
                         minute: 'numeric'
                     });
                     return(
-                        <FormItem top={'Заказ от ' + date} bottom={'Статус: ' + statuses[el.status]}>
+                        <FormItem top={'Заказ от ' + date} bottom={<>Статус: <span className={el.status === 2 ? 'snack_err' : ''}>{statuses[el.status]}</span></> }>
                             <SimpleCell
                                 style={{marginTop: -10, marginBottom: -10}}
                                 disabled
                                 after={<IconButton onClick={() => openInfo(el)} icon={<Icon28InfoCircleOutline/>}/> }
                             >
-                                Товаров в заказе: {el.items.length} <br/>
-                                Сумма: <b>{el.amount} ₽</b>
+                                Товаров в заказе: {el.total} <br/>
+                                Сумма: <b>{el.amount} ₽</b> <br/>
+                                Оплачен: {el.payed ? 'Да' : 'Нет'}
                             </SimpleCell>
                         </FormItem>
                     )

@@ -32,7 +32,6 @@ async function startApp() {
             document.getElementById('root')
         );
 
-        import('./eruda.js').then(({ default: eruda }) => {})
     }
 }
 

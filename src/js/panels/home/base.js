@@ -6,55 +6,32 @@ import {
     PanelHeader,
     PanelHeaderButton,
     Placeholder,
-    FormItem,
     Search,
     Spinner,
     ContentCard,
     Header,
-    Button, CustomSelect
+    HorizontalScroll,
+    HorizontalCell,
+    Avatar
 } from "@vkontakte/vkui";
-import {Icon28ShieldKeyholeOutline, Icon28UserStarBadgeOutline} from "@vkontakte/icons";
+import {Icon24SortOutline, Icon28ShieldKeyholeOutline, Icon28UserStarBadgeOutline} from "@vkontakte/icons";
 import {useDispatch} from "react-redux";
 import {set} from "../../reducers/mainReducer";
 import {InfScroll} from "@vkma/infscroll";
 import api from "../../components/apiFunc";
-import declOfNum from "../../components/declOfNum";
 
-let sortByOptions = [
-    {
-        label: "Не выбрано",
-        value: 0,
-    },
-    {
-        label: "По возрастанию цены",
-        value: 1,
-    },
-    {
-        label: "По убыванию цены",
-        value: 2,
-    },
-    {
-        label: "Хиты продаж",
-        value: 3,
-    },
-    {
-        label: "Новые товары",
-        value: 4,
-    }
-]
-
-function Market({router, products, setMarket, admin, getUserReviews, getMarket, storage, loading, setLoading, albums}) {
+function Market({
+                    router,
+                    products,
+                    setMarket, admin, getUserReviews, getMarket, storage, loading, setLoading, albums}) {
     const dispatch = useDispatch()
 
     const [need, setNeed] = useState(true)
     const [result, setResult] = useState(true)
-    const [but, setBut] = useState(true)
-
-    const [sortBy, setSortBy] = useState(0)
 
     function openInfo(data) {
         dispatch(set({key: 'infoProduct', value: data}))
-        router.toPanel('infoProduct')
+        router.toPanel(storage.isDesktop ? 'infoProductDesktop' : 'infoProduct')
     }
 
     useEffect(() => {
@@ -65,11 +42,11 @@ function Market({router, products, setMarket, admin, getUserReviews, getMarket, 
 
     const search = useDebounce(async (query) => {
         if (query.length === 0) {
-            getMarket(null, sortBy)
+            getMarket(null)
             setNeed(true)
             return
         }
-        let res = await api(`items?query=${query}&sortBy=${sortBy}`, 'GET')
+        let res = await api(`items?query=${query}&sortBy=0`, 'GET')
         if (res.response) {
             if (res.items.length === 0) {
                 setResult(false)
@@ -116,115 +93,86 @@ function Market({router, products, setMarket, admin, getUserReviews, getMarket, 
                 Товары
             </PanelHeader>
             {products.length > 0 || !loading ?
-                <>
-                    {albums.length > 0 &&
-                        <Group separator={false}
-                               header={<Header>Подборки <span className='count_cart'>{albums.length}</span></Header>}>
-                            <CardGrid size='l' className='products'>
-                                {but ?
-                                    <>
-                                        <ContentCard
-                                            src={albums[0].url}
-                                            text={albums[0].name}
-                                            caption={albums[0].count + ' ' + declOfNum(albums[0].count, ["товар", "товара", "товаров"])}
-                                            maxHeight={storage.isDesktop ? 150 : 75}
-                                            onClick={() => {
-                                                dispatch(set({key: 'albumId', value: albums[0].id}))
-                                                router.toPanel('album')
-                                            }
-                                            }
-                                        />
-                                        <ContentCard
-                                            src={albums[1].url}
-                                            text={albums[1].name}
-                                            caption={albums[1].count + ' ' + declOfNum(albums[1].count, ["товар", "товара", "товаров"])}
-                                            maxHeight={storage.isDesktop ? 150 : 75}
-                                            onClick={() => {
-                                                dispatch(set({key: 'albumId', value: albums[1].id}))
-                                                router.toPanel('album')
-                                            }
-                                            }
-                                        />
-                                    </>
-                                    :
-                                    albums.map((el) => {
+                <InfScroll
+                    onReachEnd={() => {
+                        need && getMarket(products.length)
+                    }}
+                    loader={need ? <Spinner size="regular" style={{height: 60}}/> : null}
+                >
+                    <Group>
+                    <Search
+                        value={storage.search}
+                        onChange={(e) => {
+                            dispatch(set({key: 'search', value: e.currentTarget.value}))
+                            search(e.currentTarget.value.replace(/^\s+/g, ''))
+                            setNeed(false)
+                        }}
+                    />
+
+                    {!storage.search &&
+                        <>
+                            <Header>Подборки</Header>
+                            <HorizontalScroll showArrows={true} style={{marginTop: 5}}>
+                                <div style={{display: 'flex'}}>
+                                    {albums.map((el, index) => {
                                         return (
-                                            <ContentCard
-                                                src={el.url}
-                                                text={el.name}
-                                                caption={el.count + ' ' + declOfNum(el.count, ["товар", "товара", "товаров"])}
-                                                maxHeight={storage.isDesktop ? 150 : 75}
+                                            <HorizontalCell
+                                                size="l"
+                                                header={
+                                                el.name.length > 30 ?
+                                                    <span className='albumName'>{el.name.slice(0, 30) + '...'}</span> :
+                                                    <span className='albumName'>{el.name}</span>
+                                            }
                                                 onClick={() => {
                                                     dispatch(set({key: 'albumId', value: el.id}))
                                                     router.toPanel('album')
-                                                }
-                                                }
-                                            />
+                                                }}
+                                                key={index}
+                                                className={'album'}
+                                            >
+                                                <Avatar size={128} src={el.url} mode='image'/>
+                                            </HorizontalCell>
                                         )
                                     })}
-                            </CardGrid>
-                            <Button
-                                mode='tertiary'
-                                stretched
-                                size='s'
-                                style={{padding: 7}}
-                                onClick={() => setBut(!but)}
-                            >
-                                {but ? 'Показать все' : 'Свернуть'}
-                            </Button>
-                        </Group>}
-                    <Group header={<Header>Все товары</Header>} separator={false}>
-                            <Search
-                                value={storage.search}
-                                onChange={(e) => {
-                                    dispatch(set({key: 'search', value: e.currentTarget.value}))
-                                    search(e.currentTarget.value.replace(/^\s+/g, ''))
-                                    setNeed(false)
-                                }}
-                            />
+                                </div>
+                            </HorizontalScroll>
+                        </>
 
-                        <FormItem top={"Сортировка"} style={{marginBottom: 10}}>
-                            <CustomSelect
-                                placeholder="Не выбран"
-                                options={sortByOptions}
-                                value={sortBy}
-                                onChange={(e) => {
-                                    getMarket(null, +e.target.value)
-                                    setSortBy(e.target.value)
-                                }}
-                            />
-                        </FormItem>
+                        }
+
+                        {!storage.search &&
+                            <Header
+                                aside={
+                                    <Icon24SortOutline
+                                        onClick={() => router.toModal('sort')}
+                                        className='sortIcon'
+                                    />
+                                }
+                            >
+                                Популярные товары
+                            </Header>
+                        }
 
                         {result ?
-                            <InfScroll
-                                onReachEnd={() => {
-                                    need && getMarket(products.length, sortBy)
-                                }}
-                                loader={need ? <Spinner size="regular" style={{height: 60}}/> : null}
-                            >
-                                <CardGrid size='l' className='products'>
-                                    {products.map((el) => {
-                                        return (
-                                            <ContentCard
-                                                onClick={() => openInfo(el)}
-                                                src={el.url}
-                                                header={<b>{el.price} ₽</b>}
-                                                text={el.name}
-                                                maxHeight={300}
-                                            />
-                                        )
-                                    })}
-
-                                </CardGrid>
-                            </InfScroll> :
+                            <CardGrid size='l' className='products'>
+                                {products.map((el, index) => {
+                                  return (
+                                      <ContentCard
+                                          onClick={() => openInfo(el)}
+                                          src={el.url}
+                                          header={<b>{el.price} ₽</b>}
+                                          text={el.name.length > 50 ? el.name.slice(0, 50) + '...' : el.name}
+                                      />
+                                  )
+                                })}
+                            </CardGrid> :
                             <Placeholder>
                                 Ничего не найдено
                             </Placeholder>
                         }
                     </Group>
-
-                </> :
-                <Spinner style={{marginTop: 10}}/>
+                </InfScroll> :
+                <Spinner/>
             }
         </>
     )

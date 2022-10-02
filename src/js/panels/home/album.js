@@ -61,7 +61,7 @@ function Album({router, storage}) {
 
     function openInfo(data) {
         dispatch(set({key: 'infoProduct', value: data}))
-        router.toPanel('infoProduct')
+        router.toPanel(storage.isDesktop ? 'infoProductDesktop' : 'infoProduct')
     }
 
     const search = useDebounce(async (query) => {
@@ -113,11 +113,14 @@ function Album({router, storage}) {
         >
             Подборка
         </PanelHeader>
-        <Group>
             {loading ?
                 <Spinner/> :
                 products.length > 0 ?
-                <>
+                <InfScroll
+                    onReachEnd={() => {products.length >= 20 && setNeed(true); getMarket(products.length)}}
+                    loader={need && products.length >= 20 ? <Spinner size="regular" style={{ height: 60 }}/> : null}
+                >
+                    <Group>
                     <Search
                         value={storage.search}
                         onChange={(e) => {
@@ -128,29 +131,24 @@ function Album({router, storage}) {
                         style={{marginBottom: 10}}
                     />
                     {result ?
-                        <InfScroll
-                            onReachEnd={() => {products.length >= 20 && setNeed(true); getMarket(products.length)}}
-                            loader={need && products.length >= 20 ? <Spinner size="regular" style={{ height: 60 }}/> : null}
-                        >
                             <CardGrid size='l' className='products'>
                                 {products.map((el) => {
                                     return (
                                         <ContentCard
                                             onClick={() => openInfo(el)}
                                             src={el.url}
-                                            header={el.price + ' ₽'}
-                                            text={el.name}
-                                            maxHeight={300}
+                                            header={<b>{el.price} ₽</b>}
+                                            text={el.name.length > 50 ? el.name.slice(0, 50) + '...' : el.name}
                                         />
                                     )
                                 })}
                             </CardGrid>
-                        </InfScroll> :
+                         :
                         <Placeholder>Ничего не найдено</Placeholder>
                     }
-                </> :
-                <Placeholder>Ничего не найдено</Placeholder>}
-        </Group>
+                    </Group>
+                </InfScroll>:
+            <Placeholder>Ничего не найдено</Placeholder>}
         </>
     )
 }

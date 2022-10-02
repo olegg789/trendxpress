@@ -15,18 +15,10 @@ import {Icon28DeleteOutline, Icon28ShoppingCartOutline} from "@vkontakte/icons";
 import {set} from "../../reducers/mainReducer";
 import declOfNum from "../../components/declOfNum";
 
-function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}) {
+function Cart({router, isDesktop, storage, dispatch, setCount, count}) {
 
-    const [price, setPrice] = useState(0)
     const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')))
-
-    function deleteFromCart(index) {
-        let arr = cart
-        arr.splice(index, 1);
-        localStorage.setItem('cart', JSON.stringify(arr))
-        setCount(count - 1)
-        calc()
-    }
+    const [price, setPrice] = useState(0)
 
     function calc() {
         if (JSON.parse(localStorage.getItem('cart')).length !== 0) {
@@ -37,6 +29,14 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
             }
             setPrice(res)
         }
+    }
+
+    function deleteFromCart(index) {
+        let arr = cart
+        arr.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(arr))
+        setCount(count - 1)
+        calc()
     }
 
     useEffect(() => {
@@ -54,7 +54,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                         action={
                             <Button
                                 size='l'
-                                onClick={() => router.toView('home')}
+                                onClick={() => {router.toView('home'); router.toPanel('base')}}
                                 mode='secondary'
                             >
                                 За покупками
@@ -65,7 +65,7 @@ function Cart({router, isDesktop, storage, dispatch, checkCart, setCount, count}
                         Добавь нужные товары в корзину и возвращайся снова!
                     </Placeholder> :
                     <>
-                        <div style={ storage.isDesktop ? count >= 4 ? {marginBottom: 90} : {} : {marginBottom: 120}}>
+                        <div style={{marginBottom: 150}}>
                             <Header>Ваша корзина</Header>
 
                             {JSON.parse(localStorage.getItem('cart')).map((el, index) => {

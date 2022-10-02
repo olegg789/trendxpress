@@ -19,6 +19,11 @@ const structure = [
 			},
 
 			{
+				id: "infoProductDesktop",
+				hash: '/product'
+			},
+
+			{
 				id: 'addItem',
 				hash: ''
 			},

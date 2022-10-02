@@ -25,14 +25,14 @@ import DesktopNavigation from './js/components/navigation/desktop';
 import MobailNavigation from './js/components/navigation/mobail';
 
 import Market from "./js/panels/home/base";
-import InfoProduct from "./js/panels/home/placeholder";
+import InfoProduct from "./js/panels/home/product_m";
 import Cart from "./js/panels/cart/base";
 import Orders from "./js/panels/orders/base";
 import NewOrder from "./js/panels/cart/newOrder";
 import api from "./js/components/apiFunc";
 import AddItem from "./js/panels/home/admin/addItem";
 import Admin from "./js/panels/home/admin/admin";
-import {Icon28CheckCircleOutline} from "@vkontakte/icons";
+import {Icon28CheckCircleOutline, Icon28Notification} from "@vkontakte/icons";
 import EditItem from "./js/panels/home/admin/editItem";
 import OrderInfo from "./js/components/modals/HomeBotInfoModal";
 import ViewOrders from "./js/panels/home/admin/viewOrders";
@@ -47,6 +47,10 @@ import ViewReviews from "./js/panels/home/admin/viewReviews";
 import AddReview from "./js/panels/home/admin/addReview";
 import Settings from "./js/panels/home/admin/settings";
 import AddUserReview from "./js/panels/home/addUserReview";
+import ProductDesktop from "./js/panels/home/product_d";
+import Description from "./js/components/modals/description";
+import Payment from "./js/components/modals/payment";
+import Sort from "./js/components/modals/sort";
 
 const App = withAdaptivity(({ viewWidth, router }) => {
   const mainStorage = useSelector((state) => state.main)
@@ -63,6 +67,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
   const [snackbar, setSnackbar] = useState(null)
   const [loadingMain, setLoadingMain] = useState(true)
   const [albums, setAlbums] = useState([])
+  const [sortBy, setSortBy] = useState(0)
 
   const localstorage = localStorage
 
@@ -106,29 +111,60 @@ const App = withAdaptivity(({ viewWidth, router }) => {
     getOrders()
   }
 
-  async function getMarket(offset = null, sortByProp = 0) {
-    console.log(sortByProp)
-    const sort = sortByProp === 0 ? '' : sortByProp-1
-    setLoadingMain(true)
-    if (!offset) {
-      let res = await api(`items?sortBy=${sort}`, 'GET')
-      if (res.response) {
-        setMarket(res.items)
+  async function getMarket(offset = null) {
+    try {
+      const sort = sortBy === 0 ? '' : sortBy-1
+      setLoadingMain(true)
+      if (!offset) {
+        let res = await api(`items?sortBy=${sort}&limit=20&offset=0`, 'GET')
+        if (res.response) {
+          setMarket(res.items)
+          console.info('method', 'if')
+        }
+      }
+      else {
+        if (sort === 0) {
+          let res = await api(`items?offset=${offset}&limit=20`, 'GET')
+          if (res.response) {
+            let items = market
+            res.items.map((el) => {
+              items.push(el)
+              return items
+            })
+            await setMarket(items)
+            console.info('method', 'else')
+          }
+        }
+
+        else if (sort !== 0 && offset === 0) {
+            let res = await api(`items?sortBy=${sort}&offset=0&limit=20`, 'GET')
+            if (res.response) {
+              await setMarket([])
+              setMarket(res.items)
+              console.info('method', 'else')
+            }
+          }
+
+          else if (sort !== 0 && offset !== 0) {
+              let res = await api(`items?sortBy=${sort}&offset=${offset}&limit=20`, 'GET')
+              if (res.response) {
+                  let items = market
+                  res.items.map((el) => {
+                  items.push(el)
+                    return items
+                  })
+                  await setMarket(items)
+                  console.info('method', 'else')
+              }
+          setLoadingMain(false)
+        }
+
       }
     }
-    else {
-      let res = await api(`items?offset=${offset}&limit=20&sortBy=${sort}`, 'GET')
-      if (res.response) {
-        let items = market
-        items.reverse()
-        // eslint-disable-next-line
-        res.items.map((el) => {
-          items.unshift(el)
-        })
-        setMarket(items.reverse())
-      }
+    catch (err) {
+      console.log(err)
+      setMarket([])
     }
-    setLoadingMain(false)
   }
 
   async function getAlbums() {
@@ -238,11 +274,26 @@ const App = withAdaptivity(({ viewWidth, router }) => {
     }
   }
 
+  async function showNotifies() {
+    let num = Math.floor(Math.random() * 4)
+    if (num === 0) {
+      bridge.send('VKWebAppGetLaunchParams').then(data => {
+        if (!data.vk_are_notifications_enabled) {
+          bridge.send('VKWebAppAllowNotifications').then(data => {
+            if (data.result) {
+                openSnackbar('Уведомления включены!', <Icon28Notification className='snack_suc'/>)
+            }
+          })
+        }
+      })
+    }
+  }
+
   useEffect(() => {
     getAppScheme();
     checkAdmin();
     getAlbums();
-    checkCart()
+    checkCart();
   }, [])
 
   const modals = (
@@ -255,6 +306,21 @@ const App = withAdaptivity(({ viewWidth, router }) => {
           getOrders={() => getOrders()}
           getOrdersAdmin={() => getOrdersAdmin()}
           openSnackbar={(text, icon) => openSnackbar(text, icon)}
+      />
+      <Description
+          nav='description'
+          storage={mainStorage}
+      />
+      <Payment
+          nav='payment'
+          storage={mainStorage}
+      />
+      <Sort
+          nav='sort'
+          getMarket={(offset, sortBy) => getMarket(offset, sortBy)}
+          products={market}
+          sortBy={sortBy}
+            setSortBy={(value) => setSortBy(value)}
       />
     </ModalRoot>
   );
@@ -302,6 +368,10 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                   {snackbar}
                 </Panel>
 
+                <Panel id='album'>
+                  <Album storage={mainStorage}/>
+                </Panel>
+
                 <Panel id='infoProduct'>
                   <InfoProduct
                       storage={mainStorage}
@@ -315,16 +385,31 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       openSnackbar={(text, icon) => openSnackbar(text, icon)}
                       getMarket={(offset) => getMarket(offset)}
                       albums={albums}
+                      showNotifies={() => showNotifies()}
                   />
                   {snackbar}
                 </Panel>
 
-                <Panel id='album'>
-                  <Album storage={mainStorage}/>
+                <Panel id='infoProductDesktop'>
+                  <ProductDesktop
+                      storage={mainStorage}
+                      declOfNum={(number, words) => declOfNum(number, words)}
+                      localstorage={localstorage}
+                      dispatch={(value) => dispatch(value)}
+                      count={count}
+                      setCount={(value) => setCount(value)}
+                      openSnackbarCart={() => openSnackbarCart()}
+                      admin={admin}
+                      openSnackbar={(text, icon) => openSnackbar(text, icon)}
+                      getMarket={(offset) => getMarket(offset)}
+                      albums={albums}
+                        showNotifies={() => showNotifies()}
+                  />
+                  {snackbar}
                 </Panel>
 
                 <Panel id='about'>
-                  <About/>
+                  <About storage={mainStorage}/>
                 </Panel>
 
                 <Panel id='admin'>
@@ -451,6 +536,7 @@ const App = withAdaptivity(({ viewWidth, router }) => {
                       openSnackbar={(text, icon) => openSnackbar(text, icon)}
                       setCount={(value) => setCount(value)}
                       getOrders={() => getOrders()}
+                      showNotifies={() => showNotifies()}
                   />
                   {snackbar}
                 </Panel>

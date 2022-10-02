@@ -34,9 +34,12 @@ function InfoProduct({
      openSnackbar,
     getMarket,
     setCart,
-    albums
+    albums,
+    showNotifies
 }) {
     const [album, setAlbum] = useState({name: ''})
+    // eslint-disable-next-line
+    const [price, setPrice] = useState(0)
 
     function findAlbum() {
         if (storage.infoProduct.album_ids !== null) {
@@ -69,6 +72,19 @@ function InfoProduct({
             localStorage.setItem('cart', items)
         }
         openSnackbarCart()
+        calc()
+        showNotifies()
+    }
+
+    function calc() {
+        if (JSON.parse(localStorage.getItem('cart')).length !== 0) {
+            const count = JSON.parse(localStorage.getItem('cart')).length - 1
+            let res = 0
+            for (let i=0;i<=count;i++) {
+                res = res + Number(JSON.parse(localStorage.getItem('cart'))[i].price)
+            }
+            setPrice(res)
+        }
     }
 
     function openAlert() {
@@ -109,6 +125,10 @@ function InfoProduct({
         }
     }
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    })
+
     return(
         <>
             <PanelHeader
@@ -120,11 +140,10 @@ function InfoProduct({
 
             <Group>
                 <div style={ storage.isDesktop ? {marginBottom: 60} : {marginBottom: 120}}>
-                    <Gallery
-                        style={{cursor: 'default'}}
-                    >
+                    <Gallery>
                         <img
                             src={storage.infoProduct.url}
+
                             alt=''
                             style={{cursor: 'default', borderRadius: storage.isDesktop ? 10 : 0}}
                             onClick={() => bridge.send("VKWebAppShowImages", {images: [storage.infoProduct.url]})}
